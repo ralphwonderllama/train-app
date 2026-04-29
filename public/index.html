@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrainAI - AI Personal Trainer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Nunito+Sans:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #000000; color: #fff; font-family: "Nunito Sans", sans-serif; }
+        .app { background: #000000; min-height: 100vh; padding: 1.5rem 1rem 8rem; max-width: 420px; margin: 0 auto; }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        .header { margin-bottom: 2.5rem; }
+        .brand { font-family: "Poppins", sans-serif; font-size: 24px; font-weight: 700; margin: 0 0 0.25rem; color: #fff; letter-spacing: 1px; }
+        .subtitle { font-size: 12px; color: #B1B3B3; margin: 0; letter-spacing: 2px; text-transform: uppercase; }
+
+        .metric-card { border: 1px solid #B1B3B3; border-radius: 2px; padding: 1.5rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); position: relative; overflow: hidden; }
+        .metric-card::before { content: ''; position: absolute; top: 8px; right: 8px; width: 16px; height: 16px; border-top: 1px solid #B1B3B3; border-right: 1px solid #B1B3B3; }
+        .metric-card::after { content: ''; position: absolute; bottom: 8px; left: 8px; width: 16px; height: 16px; border-bottom: 1px solid #B1B3B3; border-left: 1px solid #B1B3B3; }
+
+        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .metric-item { display: flex; flex-direction: column; }
+        .metric-label { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 11px; color: #B1B3B3; text-transform: uppercase; letter-spacing: 1px; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .metric-value { font-size: 20px; font-weight: 600; }
+        .metric-status { font-size: 10px; color: #B1B3B3; margin-top: 4px; }
+
+        .btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: fixed; bottom: 1rem; left: 1rem; right: calc(1rem + 420px); max-width: 388px; z-index: 100; }
+
+        button { padding: 12px 16px; cursor: pointer; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-family: "Nunito Sans", sans-serif; border-radius: 2px; transition: all 0.2s; border: 1px solid #B1B3B3; background: transparent; color: #B1B3B3; }
+        button.primary { background: #ED1C24; border: none; color: #000000; box-shadow: 0 0 15px rgba(237, 28, 36, 0.4); }
+        button.primary:hover { box-shadow: 0 0 25px rgba(237, 28, 36, 0.8); }
+        button.success { background: #00D166; border: none; color: #000000; box-shadow: 0 0 15px rgba(0, 209, 102, 0.4); }
+        button.success:hover { box-shadow: 0 0 25px rgba(0, 209, 102, 0.8); }
+        button:hover { color: #fff; border-color: #fff; }
+
+        .slider-group { border-left: 2px solid #ED1C24; padding-left: 12px; margin-bottom: 1.75rem; }
+        .slider-group.energy { border-left-color: #FFCC00; }
+        .slider-group.nutrition { border-left-color: #00D166; }
+        .slider-group.pain { border-left-color: #ED1C24; }
+
+        input[type="range"] { width: 100%; height: 4px; appearance: none; background: #1a1a1a; border: 0.5px solid #B1B3B3; outline: none; border-radius: 2px; margin: 10px 0; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #ED1C24; cursor: pointer; box-shadow: 0 0 10px rgba(237, 28, 36, 0.6); }
+        input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #ED1C24; cursor: pointer; border: none; box-shadow: 0 0 10px rgba(237, 28, 36, 0.6); }
+
+        .slider-label { display: block; font-size: 12px; font-weight: 600; color: #fff; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .slider-hint { font-size: 11px; color: #B1B3B3; margin-top: 6px; }
+
+        .adjustment-item { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); border: 1px solid; border-radius: 2px; padding: 1rem 1.25rem; margin-bottom: 12px; border-left-width: 3px; }
+        .adjustment-trigger { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.5px; border: 0.5px solid; display: inline-block; margin-bottom: 10px; }
+        .adjustment-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .adjustment-detail { font-size: 12px; color: #B1B3B3; line-height: 1.5; }
+
+        .header-audiowide { font-family: "Audiowide", sans-serif; font-size: 18px; font-weight: 400; margin: 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+
+        .advisory { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); border: 1px solid #B1B3B3; padding: 1rem 1.25rem; border-radius: 2px; margin-bottom: 2rem; }
+        .advisory-title { font-size: 11px; font-weight: 600; color: #00D166; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .advisory-text { font-size: 12px; color: #fff; line-height: 1.6; }
+
+        .duration-card { border: 1px solid #B1B3B3; border-radius: 2px; padding: 1.5rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); }
+        .duration-label { font-size: 11px; color: #B1B3B3; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .duration-value { font-size: 32px; font-weight: 700; color: #ED1C24; margin-bottom: 8px; text-shadow: 0 0 20px rgba(237, 28, 36, 0.3); }
+        .duration-type { font-size: 12px; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .adjustments-label { font-family: "Audiowide", sans-serif; font-size: 14px; font-weight: 400; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+<div class="app">
+  <!-- HOME SCREEN -->
+  <div class="screen active" id="homeScreen">
+    <div class="header">
+      <div class="brand">TRAINAI</div>
+      <div class="subtitle">AI PERFORMANCE CALIBRATION</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-grid">
+        <div class="metric-item">
+          <div class="metric-label">
+            <div class="status-dot" id="sleepDot"></div>
+            <span>SLEEP</span>
+          </div>
+          <div class="metric-value" id="sleepValue">7h</div>
+          <div class="metric-status" id="sleepStatus">OPTIMAL</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">
+            <div class="status-dot" id="energyDot"></div>
+            <span>ENERGY</span>
+          </div>
+          <div class="metric-value" id="energyValue">7/10</div>
+          <div class="metric-status" id="energyStatus">PEAK</div>
+        </div>
+      </div>
+      <div style="border-top: 0.5px solid #B1B3B3; padding-top: 1rem; margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <div style="font-size: 11px; color: #B1B3B3; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">DAILY STEPS</div>
+          <div style="font-size: 18px; font-weight: 600; color: #fff;" id="stepsValue">8.2k</div>
+        </div>
+        <div>
+          <div style="font-size: 11px; color: #B1B3B3; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">RECOVERY</div>
+          <div style="font-size: 18px; font-weight: 600; color: #00D166;" id="recoveryValue">75%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-container">
+      <button onclick="switchScreen('vitalsScreen')">Update Vitals</button>
+      <button class="primary" onclick="switchScreen('planScreen')">View Plan</button>
+    </div>
+  </div>
+
+  <!-- VITALS SCREEN -->
+  <div class="screen" id="vitalsScreen">
+    <div class="header">
+      <div class="header-audiowide">DIAGNOSTIC INPUT</div>
+      <div class="subtitle" style="margin-top: 0.5rem;">Real-time vitals calibration</div>
+    </div>
+
+    <div class="slider-group">
+      <label class="slider-label">SLEEP DURATION: <span id="sleepVal">7</span>h</label>
+      <input type="range" id="sleepSlider" min="3" max="12" value="7" onchange="updateTempVital('sleep', this.value)">
+      <div class="slider-hint">Target: 7-9 hours optimal</div>
+    </div>
+
+    <div class="slider-group energy">
+      <label class="slider-label">ENERGY LEVEL: <span id="energyVal">7</span>/10</label>
+      <input type="range" id="energySlider" min="1" max="10" value="7" onchange="updateTempVital('energy', this.value)">
+      <div class="slider-hint">How energized are you?</div>
+    </div>
+
+    <div class="slider-group nutrition">
+      <label class="slider-label">NUTRITION STATUS: <span id="nutritionVal">8</span>/10</label>
+      <input type="range" id="nutritionSlider" min="1" max="10" value="8" onchange="updateTempVital('nutrition', this.value)">
+      <div class="slider-hint">Quality of fuel today</div>
+    </div>
+
+    <div class="slider-group pain">
+      <label class="slider-label">PAIN INDICATORS: <span id="painVal">2</span>/10</label>
+      <input type="range" id="painSlider" min="0" max="10" value="2" onchange="updateTempVital('pain', this.value)">
+      <div class="slider-hint">Any nagging issues or soreness?</div>
+    </div>
+
+    <div class="btn-container">
+      <button onclick="switchScreen('homeScreen')">Cancel</button>
+      <button class="primary" onclick="saveVitals(); switchScreen('planScreen');">Calibrate</button>
+    </div>
+  </div>
+
+  <!-- PLAN SCREEN -->
+  <div class="screen" id="planScreen">
+    <div class="header">
+      <div class="header-audiowide">ADAPTIVE PROTOCOL</div>
+      <div class="subtitle" style="margin-top: 0.5rem;">AI-Calibrated Training Plan</div>
+    </div>
+
+    <div class="duration-card">
+      <div class="duration-label">Recommended Duration</div>
+      <div class="duration-value">60 MIN</div>
+      <div class="duration-type">Upper Body Strength + Core</div>
+    </div>
+
+    <div class="adjustments-label">DIAGNOSTIC ADJUSTMENTS</div>
+    <div id="adjustmentsList"></div>
+
+    <div class="advisory">
+      <div class="advisory-title">✓ SYSTEM ADVISORY</div>
+      <div class="advisory-text">Update vitals before each session for maximum precision. AI calibration improves with consistent data input across your training cycle.</div>
+    </div>
+
+    <div class="btn-container">
+      <button onclick="switchScreen('homeScreen')">Back</button>
+      <button class="success">Execute Protocol</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let vitals = { sleep: 7, energy: 7, nutrition: 8, pain: 2, steps: 8245, recovery: 75 };
+let tempVitals = { ...vitals };
+
+function switchScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  if (screenId === 'planScreen') renderAdjustments();
+}
+
+function updateTempVital(key, value) {
+  tempVitals[key] = parseInt(value);
+  document.getElementById(key + 'Val').textContent = value;
+}
+
+function saveVitals() {
+  vitals = { ...tempVitals };
+  updateHomeDisplay();
+}
+
+function getSleepStatus(h) {
+  if (h >= 7 && h <= 9) return { color: '#00D166', label: 'OPTIMAL' };
+  if (h >= 6 || h <= 10) return { color: '#FFCC00', label: 'ADEQUATE' };
+  return { color: '#ED1C24', label: 'COMPROMISED' };
+}
+
+function getEnergyStatus(e) {
+  if (e >= 7) return { color: '#00D166', label: 'PEAK' };
+  if (e >= 5) return { color: '#FFCC00', label: 'MODERATE' };
+  return { color: '#ED1C24', label: 'DEPLETED' };
+}
+
+function updateHomeDisplay() {
+  const sleepStatus = getSleepStatus(vitals.sleep);
+  const energyStatus = getEnergyStatus(vitals.energy);
+
+  document.getElementById('sleepValue').textContent = vitals.sleep + 'h';
+  document.getElementById('sleepStatus').textContent = sleepStatus.label;
+  document.getElementById('sleepDot').style.background = sleepStatus.color;
+  document.getElementById('sleepDot').style.boxShadow = `0 0 12px ${sleepStatus.color}`;
+
+  document.getElementById('energyValue').textContent = vitals.energy + '/10';
+  document.getElementById('energyStatus').textContent = energyStatus.label;
+  document.getElementById('energyDot').style.background = energyStatus.color;
+  document.getElementById('energyDot').style.boxShadow = `0 0 12px ${energyStatus.color}`;
+
+  document.getElementById('stepsValue').textContent = (vitals.steps / 1000).toFixed(1) + 'k';
+  document.getElementById('recoveryValue').textContent = vitals.recovery + '%';
+}
+
+function renderAdjustments() {
+  const adjustments = [];
+
+  if (vitals.sleep < 6) {
+    adjustments.push({ trigger: `${vitals.sleep}h SLEEP`, adjustment: 'REDUCE VOLUME 35%', details: 'Lower intensity. Focus recovery protocols.', color: '#ED1C24' });
+  } else if (vitals.sleep < 7) {
+    adjustments.push({ trigger: `${vitals.sleep}h SLEEP`, adjustment: 'REDUCE VOLUME 25%', details: 'Extend rest periods by 30 seconds.', color: '#FFCC00' });
+  } else if (vitals.sleep >= 8) {
+    adjustments.push({ trigger: `${vitals.sleep}h SLEEP`, adjustment: 'INCREASE INTENSITY 15%', details: 'Add extra volume. Reduce rest intervals.', color: '#00D166' });
+  }
+
+  if (vitals.energy < 4) {
+    adjustments.push({ trigger: 'ENERGY DEPLETED', adjustment: 'SWITCH TO LIGHT CARDIO', details: 'Skip heavy compounds. Mobilization focus.', color: '#ED1C24' });
+  } else if (vitals.energy < 6) {
+    adjustments.push({ trigger: 'ENERGY MODERATE', adjustment: 'REDUCE MAX ATTEMPTS', details: 'Focus form and controlled cadence.', color: '#FFCC00' });
+  }
+
+  if (vitals.nutrition < 5) {
+    adjustments.push({ trigger: 'NUTRITION DEFICIT', adjustment: 'CAP SESSION 45 MIN', details: 'Insufficient fuel. Limit metabolic demand.', color: '#ED1C24' });
+  } else if (vitals.nutrition >= 8) {
+    adjustments.push({ trigger: 'NUTRITION OPTIMAL', adjustment: 'ENABLE VOLUME BOOST', details: 'Maximum capacity. Add accessory work.', color: '#00D166' });
+  }
+
+  if (vitals.pain > 5) {
+    adjustments.push({ trigger: `PAIN LEVEL ${vitals.pain}/10`, adjustment: 'MODIFY RANGE OF MOTION', details: 'Avoid stress patterns. Adjust joint angles.', color: '#ED1C24' });
+  }
+
+  if (adjustments.length === 0) {
+    adjustments.push({ trigger: 'CONDITIONS OPTIMAL', adjustment: 'EXECUTE FULL PROGRAM', details: 'All systems nominal. Standard protocol.', color: '#00D166' });
+  }
+
+  let html = '';
+  adjustments.forEach(adj => {
+    html += `
+      <div class="adjustment-item" style="border-color: ${adj.color}40; border-left-color: ${adj.color};">
+        <div class="adjustment-trigger" style="color: ${adj.color}; background: ${adj.color}15; border-color: ${adj.color}30;">${adj.trigger}</div>
+        <div class="adjustment-title">${adj.adjustment}</div>
+        <div class="adjustment-detail">${adj.details}</div>
+      </div>
+    `;
+  });
+  document.getElementById('adjustmentsList').innerHTML = html;
+}
+
+updateHomeDisplay();
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "buildCommand": "echo 'Static site'",
+  "outputDirectory": "public",
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
