@@ -100,6 +100,19 @@
           color: #666;
           opacity: 0.6;
         }
+
+        /* Oura Ring Status */
+        .oura-status-row { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); border: 1px solid #B1B3B3; border-radius: 2px; padding: 0.875rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+        .oura-status-left { display: flex; align-items: center; gap: 10px; }
+        .oura-dot { width: 10px; height: 10px; border-radius: 50%; background: #B1B3B3; flex-shrink: 0; }
+        .oura-dot.connected { background: #00D166; box-shadow: 0 0 10px rgba(0, 209, 102, 0.7); }
+        .oura-dot.loading { background: #FFCC00; animation: pulse 1.5s infinite; }
+        .oura-label { font-size: 11px; color: #B1B3B3; text-transform: uppercase; letter-spacing: 1px; }
+        .oura-label.connected { color: #00D166; }
+        .oura-scores { display: flex; gap: 12px; }
+        .oura-score-item { text-align: right; }
+        .oura-score-value { font-size: 14px; font-weight: 700; color: #fff; }
+        .oura-score-label { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
@@ -138,6 +151,27 @@
         <div>
           <div style="font-size: 11px; color: #B1B3B3; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">RECOVERY</div>
           <div style="font-size: 18px; font-weight: 600; color: #00D166;" id="recoveryValue">75%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oura-status-row" id="ouraStatusRow">
+      <div class="oura-status-left">
+        <div class="oura-dot loading" id="ouraDot"></div>
+        <div class="oura-label" id="ouraLabel">OURA — SYNCING...</div>
+      </div>
+      <div class="oura-scores" id="ouraScores" style="display:none;">
+        <div class="oura-score-item">
+          <div class="oura-score-value" id="ouraSleepScore">—</div>
+          <div class="oura-score-label">Sleep</div>
+        </div>
+        <div class="oura-score-item">
+          <div class="oura-score-value" id="ouraReadinessScore">—</div>
+          <div class="oura-score-label">Readiness</div>
+        </div>
+        <div class="oura-score-item">
+          <div class="oura-score-value" id="ouraActivityScore">—</div>
+          <div class="oura-score-label">Activity</div>
         </div>
       </div>
     </div>
@@ -227,40 +261,33 @@ let vitals = { sleep: 7, energy: 7, nutrition: 8, pain: 2, steps: 8245, recovery
 let tempVitals = { ...vitals };
 let workoutState = { gymDetected: false, gymCheckInTime: null, workoutIntensity: 'Standard' };
 
-// Fetch gym check-in status from API
 async function fetchGymCheckInStatus() {
   try {
     const response = await fetch('/api/workout', { method: 'GET' });
     const data = await response.json();
-
     if (data.detected && data.data) {
       workoutState.gymDetected = true;
       workoutState.gymCheckInTime = data.data.timestamp;
       updateGymPresenceUI(true, data.data);
-
-      // Auto-adjust workout when gym is detected
       autoAdjustWorkoutForGym();
     } else {
       workoutState.gymDetected = false;
       updateGymPresenceUI(false);
     }
   } catch (error) {
-    console.log('Gym check-in status fetch error (expected in development):', error.message);
+    console.log('Gym check-in status fetch error:', error.message);
     updateGymPresenceUI(false);
   }
 }
 
-// Update UI to show gym presence status
 function updateGymPresenceUI(detected, checkInData = null) {
   const row = document.getElementById('gymPresenceRow');
   const status = document.getElementById('gymPresenceStatus');
   const timestamp = document.getElementById('gymPresenceTimestamp');
-
   if (detected && checkInData) {
     row.classList.remove('waiting');
     row.classList.add('detected');
     status.textContent = `DETECTED: ${checkInData.gym}`;
-
     const checkInTime = new Date(checkInData.timestamp);
     const timeStr = checkInTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     timestamp.textContent = `Check-in at ${timeStr}`;
@@ -272,9 +299,7 @@ function updateGymPresenceUI(detected, checkInData = null) {
   }
 }
 
-// Auto-adjust workout parameters when gym is detected
 function autoAdjustWorkoutForGym() {
-  // Update plan screen duration
   document.querySelector('.duration-value').textContent = '60 MIN';
   document.querySelector('.duration-type').textContent = 'Gym Session - High Intensity';
   workoutState.workoutIntensity = 'High';
@@ -283,9 +308,7 @@ function autoAdjustWorkoutForGym() {
 function switchScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(screenId).classList.add('active');
-  if (screenId === 'vitalsScreen') {
-    fetchGymCheckInStatus();
-  }
+  if (screenId === 'vitalsScreen') fetchGymCheckInStatus();
   if (screenId === 'planScreen') renderAdjustments();
 }
 
@@ -314,29 +337,23 @@ function getEnergyStatus(e) {
 function updateHomeDisplay() {
   const sleepStatus = getSleepStatus(vitals.sleep);
   const energyStatus = getEnergyStatus(vitals.energy);
-
   document.getElementById('sleepValue').textContent = vitals.sleep + 'h';
   document.getElementById('sleepStatus').textContent = sleepStatus.label;
   document.getElementById('sleepDot').style.background = sleepStatus.color;
   document.getElementById('sleepDot').style.boxShadow = `0 0 12px ${sleepStatus.color}`;
-
   document.getElementById('energyValue').textContent = vitals.energy + '/10';
   document.getElementById('energyStatus').textContent = energyStatus.label;
   document.getElementById('energyDot').style.background = energyStatus.color;
   document.getElementById('energyDot').style.boxShadow = `0 0 12px ${energyStatus.color}`;
-
   document.getElementById('stepsValue').textContent = (vitals.steps / 1000).toFixed(1) + 'k';
   document.getElementById('recoveryValue').textContent = vitals.recovery + '%';
 }
 
 function renderAdjustments() {
   const adjustments = [];
-
-  // Add gym detection as primary adjustment
   if (workoutState.gymDetected) {
     adjustments.push({ trigger: 'GYM DETECTED', adjustment: 'HIGH INTENSITY SESSION ENABLED', details: 'Gym presence confirmed. System locked to 60 minute high-performance protocol.', color: '#00D166' });
   }
-
   if (vitals.sleep < 6) {
     adjustments.push({ trigger: `${vitals.sleep}h SLEEP`, adjustment: 'REDUCE VOLUME 35%', details: 'Lower intensity. Focus recovery protocols.', color: '#ED1C24' });
   } else if (vitals.sleep < 7) {
@@ -344,27 +361,22 @@ function renderAdjustments() {
   } else if (vitals.sleep >= 8) {
     adjustments.push({ trigger: `${vitals.sleep}h SLEEP`, adjustment: 'INCREASE INTENSITY 15%', details: 'Add extra volume. Reduce rest intervals.', color: '#00D166' });
   }
-
   if (vitals.energy < 4) {
     adjustments.push({ trigger: 'ENERGY DEPLETED', adjustment: 'SWITCH TO LIGHT CARDIO', details: 'Skip heavy compounds. Mobilization focus.', color: '#ED1C24' });
   } else if (vitals.energy < 6) {
     adjustments.push({ trigger: 'ENERGY MODERATE', adjustment: 'REDUCE MAX ATTEMPTS', details: 'Focus form and controlled cadence.', color: '#FFCC00' });
   }
-
   if (vitals.nutrition < 5) {
     adjustments.push({ trigger: 'NUTRITION DEFICIT', adjustment: 'CAP SESSION 45 MIN', details: 'Insufficient fuel. Limit metabolic demand.', color: '#ED1C24' });
   } else if (vitals.nutrition >= 8) {
     adjustments.push({ trigger: 'NUTRITION OPTIMAL', adjustment: 'ENABLE VOLUME BOOST', details: 'Maximum capacity. Add accessory work.', color: '#00D166' });
   }
-
   if (vitals.pain > 5) {
     adjustments.push({ trigger: `PAIN LEVEL ${vitals.pain}/10`, adjustment: 'MODIFY RANGE OF MOTION', details: 'Avoid stress patterns. Adjust joint angles.', color: '#ED1C24' });
   }
-
   if (adjustments.length === 0 || (adjustments.length === 1 && workoutState.gymDetected)) {
     adjustments.push({ trigger: 'CONDITIONS OPTIMAL', adjustment: 'EXECUTE FULL PROGRAM', details: 'All systems nominal. Standard protocol.', color: '#00D166' });
   }
-
   let html = '';
   adjustments.forEach(adj => {
     html += `
@@ -378,10 +390,54 @@ function renderAdjustments() {
   document.getElementById('adjustmentsList').innerHTML = html;
 }
 
+async function fetchOuraData() {
+  try {
+    const response = await fetch('/api/oura');
+    const data = await response.json();
+    if (data.error) { setOuraStatus('error'); return; }
+    if (data.sleep?.hours != null) {
+      vitals.sleep = data.sleep.hours;
+      tempVitals.sleep = vitals.sleep;
+      document.getElementById('sleepSlider').value = vitals.sleep;
+      document.getElementById('sleepVal').textContent = vitals.sleep;
+    }
+    if (data.activity?.steps != null) {
+      vitals.steps = data.activity.steps;
+      tempVitals.steps = vitals.steps;
+    }
+    if (data.readiness?.score != null) {
+      vitals.recovery = data.readiness.score;
+      tempVitals.recovery = vitals.recovery;
+    }
+    updateHomeDisplay();
+    const dot = document.getElementById('ouraDot');
+    const label = document.getElementById('ouraLabel');
+    const scores = document.getElementById('ouraScores');
+    dot.classList.remove('loading');
+    dot.classList.add('connected');
+    label.classList.add('connected');
+    label.textContent = 'OURA — CONNECTED';
+    scores.style.display = 'flex';
+    if (data.sleep?.score != null) document.getElementById('ouraSleepScore').textContent = data.sleep.score;
+    if (data.readiness?.score != null) document.getElementById('ouraReadinessScore').textContent = data.readiness.score;
+    if (data.activity?.score != null) document.getElementById('ouraActivityScore').textContent = data.activity.score;
+  } catch (error) {
+    setOuraStatus('error');
+    console.log('Oura fetch error:', error.message);
+  }
+}
+
+function setOuraStatus(state) {
+  const dot = document.getElementById('ouraDot');
+  const label = document.getElementById('ouraLabel');
+  dot.classList.remove('loading', 'connected');
+  if (state === 'error') label.textContent = 'OURA — UNAVAILABLE';
+}
+
 updateHomeDisplay();
 fetchGymCheckInStatus();
+fetchOuraData();
 
-// Register Service Worker for PWA support
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').then(registration => {
     console.log('Service Worker registered:', registration);
