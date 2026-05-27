@@ -1,449 +1,1167 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#000000">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="TrainAI">
-    <link rel="apple-touch-icon" href="/icon.png">
-    <link rel="icon" type="image/png" href="/icon.png">
-    <link rel="manifest" href="/manifest.json">
-    <title>TrainAI - AI Personal Trainer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Nunito+Sans:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #000000; color: #fff; font-family: "Nunito Sans", sans-serif; }
-        .app { background: #000000; min-height: 100vh; padding: 1.5rem 1rem 8rem; max-width: 420px; margin: 0 auto; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TrainAI">
+  <link rel="apple-touch-icon" href="/icon.png">
+  <link rel="icon" type="image/png" href="/icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <title>TrainAI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Nunito+Sans:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .screen { display: none; }
-        .screen.active { display: block; }
+    :root {
+      --red:    #ED1C24;
+      --green:  #00D166;
+      --yellow: #FFCC00;
+      --purple: #7B68EE;
+      --gray:   #B1B3B3;
+      --nav-h:  62px;
+    }
 
-        .header { margin-bottom: 2.5rem; }
-        .brand { font-family: "Poppins", sans-serif; font-size: 24px; font-weight: 700; margin: 0 0 0.25rem; color: #fff; letter-spacing: 1px; }
-        .subtitle { font-size: 12px; color: #B1B3B3; margin: 0; letter-spacing: 2px; text-transform: uppercase; }
+    html { height: -webkit-fill-available; }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: "Nunito Sans", sans-serif;
+      height: 100vh;
+      height: -webkit-fill-available;
+      overflow: hidden;
+    }
 
-        .metric-card { border: 1px solid #B1B3B3; border-radius: 2px; padding: 1.5rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); position: relative; overflow: hidden; }
-        .metric-card::before { content: ''; position: absolute; top: 8px; right: 8px; width: 16px; height: 16px; border-top: 1px solid #B1B3B3; border-right: 1px solid #B1B3B3; }
-        .metric-card::after { content: ''; position: absolute; bottom: 8px; left: 8px; width: 16px; height: 16px; border-bottom: 1px solid #B1B3B3; border-left: 1px solid #B1B3B3; }
+    /* ── LAYOUT ─────────────────────────────────────────── */
+    #app {
+      max-width: 430px;
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
 
-        .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .metric-item { display: flex; flex-direction: column; }
-        .metric-label { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 11px; color: #B1B3B3; text-transform: uppercase; letter-spacing: 1px; }
-        .status-dot { width: 12px; height: 12px; border-radius: 50%; }
-        .metric-value { font-size: 20px; font-weight: 600; }
-        .metric-status { font-size: 10px; color: #B1B3B3; margin-top: 4px; }
+    .screen-wrap {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 1.25rem 1rem 1.5rem;
+    }
 
-        .btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; position: fixed; bottom: 1rem; left: 1rem; right: calc(1rem + 420px); max-width: 388px; z-index: 100; }
+    .screen { display: none; }
+    .screen.active { display: block; }
 
-        button { padding: 12px 16px; cursor: pointer; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; font-family: "Nunito Sans", sans-serif; border-radius: 2px; transition: all 0.2s; border: 1px solid #B1B3B3; background: transparent; color: #B1B3B3; }
-        button.primary { background: #ED1C24; border: none; color: #000000; box-shadow: 0 0 15px rgba(237, 28, 36, 0.4); }
-        button.primary:hover { box-shadow: 0 0 25px rgba(237, 28, 36, 0.8); }
-        button.success { background: #00D166; border: none; color: #000000; box-shadow: 0 0 15px rgba(0, 209, 102, 0.4); }
-        button.success:hover { box-shadow: 0 0 25px rgba(0, 209, 102, 0.8); }
-        button:hover { color: #fff; border-color: #fff; }
+    /* ── BOTTOM NAV ─────────────────────────────────────── */
+    #bottomNav {
+      flex-shrink: 0;
+      height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+      background: #0d0d0d;
+      border-top: 1px solid #1e1e1e;
+      display: flex;
+      align-items: flex-start;
+      padding-top: 6px;
+    }
 
-        .slider-group { border-left: 2px solid #ED1C24; padding-left: 12px; margin-bottom: 1.75rem; }
-        .slider-group.energy { border-left-color: #FFCC00; }
-        .slider-group.nutrition { border-left-color: #00D166; }
-        .slider-group.pain { border-left-color: #ED1C24; }
+    .nav-tab {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 5px 4px;
+      background: none;
+      border: none;
+      color: #444;
+      font-family: "Nunito Sans", sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-tab.active { color: var(--red); }
+    .nav-icon { font-size: 19px; line-height: 1; }
 
-        input[type="range"] { width: 100%; height: 4px; appearance: none; background: #1a1a1a; border: 0.5px solid #B1B3B3; outline: none; border-radius: 2px; margin: 10px 0; }
-        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #ED1C24; cursor: pointer; box-shadow: 0 0 10px rgba(237, 28, 36, 0.6); }
-        input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: #ED1C24; cursor: pointer; border: none; box-shadow: 0 0 10px rgba(237, 28, 36, 0.6); }
+    /* ── SCREEN HEADER ──────────────────────────────────── */
+    .s-head { margin-bottom: 1.25rem; }
+    .brand {
+      font-family: "Poppins", sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .s-title {
+      font-family: "Audiowide", sans-serif;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .s-sub {
+      font-size: 10px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 3px;
+    }
 
-        .slider-label { display: block; font-size: 12px; font-weight: 600; color: #fff; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .slider-hint { font-size: 11px; color: #B1B3B3; margin-top: 6px; }
+    /* ── CARDS ──────────────────────────────────────────── */
+    .card {
+      background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%);
+      border: 1px solid #1e1e1e;
+      border-radius: 2px;
+      padding: 1.125rem 1rem;
+      margin-bottom: 0.875rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 5px; right: 5px;
+      width: 10px; height: 10px;
+      border-top: 1px solid #2a2a2a;
+      border-right: 1px solid #2a2a2a;
+    }
+    .card::after {
+      content: '';
+      position: absolute;
+      bottom: 5px; left: 5px;
+      width: 10px; height: 10px;
+      border-bottom: 1px solid #2a2a2a;
+      border-left: 1px solid #2a2a2a;
+    }
+    .card-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .card-accent-green  { border-left: 3px solid var(--green);  }
+    .card-accent-red    { border-left: 3px solid var(--red);    }
+    .card-accent-purple { border-left: 3px solid var(--purple); }
 
-        .adjustment-item { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); border: 1px solid; border-radius: 2px; padding: 1rem 1.25rem; margin-bottom: 12px; border-left-width: 3px; }
-        .adjustment-trigger { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.5px; border: 0.5px solid; display: inline-block; margin-bottom: 10px; }
-        .adjustment-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .adjustment-detail { font-size: 12px; color: #B1B3B3; line-height: 1.5; }
+    /* ── STATUS DOTS ────────────────────────────────────── */
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+    .dot-green  { background: var(--green);  box-shadow: 0 0 8px rgba(0,209,102,.7); }
+    .dot-red    { background: var(--red);    box-shadow: 0 0 8px rgba(237,28,36,.7); }
+    .dot-yellow { background: var(--yellow); box-shadow: 0 0 8px rgba(255,204,0,.7); }
+    .dot-purple { background: var(--purple); box-shadow: 0 0 8px rgba(123,104,238,.7); }
+    .dot-dim    { background: #333; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.25} }
+    .pulse { animation: pulse 2s infinite; }
 
-        .header-audiowide { font-family: "Audiowide", sans-serif; font-size: 18px; font-weight: 400; margin: 0; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+    /* ── BADGES ─────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 2px;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      white-space: nowrap;
+    }
+    .b-red    { background: rgba(237,28,36,.12);  color: var(--red);    border: .5px solid rgba(237,28,36,.3);  }
+    .b-green  { background: rgba(0,209,102,.12);  color: var(--green);  border: .5px solid rgba(0,209,102,.3);  }
+    .b-yellow { background: rgba(255,204,0,.12);  color: var(--yellow); border: .5px solid rgba(255,204,0,.3);  }
+    .b-gray   { background: rgba(255,255,255,.06); color: var(--gray);  border: .5px solid rgba(255,255,255,.1); }
 
-        .advisory { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); border: 1px solid #B1B3B3; padding: 1rem 1.25rem; border-radius: 2px; margin-bottom: 2rem; }
-        .advisory-title { font-size: 11px; font-weight: 600; color: #00D166; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        .advisory-text { font-size: 12px; color: #fff; line-height: 1.6; }
+    /* ── BUTTONS ────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 10px 14px;
+      border-radius: 2px;
+      border: 1px solid #444;
+      background: transparent;
+      color: var(--gray);
+      font-family: "Nunito Sans", sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity .15s;
+    }
+    .btn:active { opacity: .6; }
+    .btn:disabled { opacity: .35; cursor: default; }
+    .btn-primary { background: var(--red);   border-color: var(--red);   color: #000; box-shadow: 0 0 14px rgba(237,28,36,.25); }
+    .btn-success { background: var(--green); border-color: var(--green); color: #000; box-shadow: 0 0 14px rgba(0,209,102,.25); }
+    .btn-full { width: 100%; }
+    .btn-sm { padding: 6px 10px; font-size: 10px; }
 
-        .duration-card { border: 1px solid #B1B3B3; border-radius: 2px; padding: 1.5rem; margin-bottom: 1.5rem; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); }
-        .duration-label { font-size: 11px; color: #B1B3B3; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        .duration-value { font-size: 32px; font-weight: 700; color: #ED1C24; margin-bottom: 8px; text-shadow: 0 0 20px rgba(237, 28, 36, 0.3); }
-        .duration-type { font-size: 12px; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
-        .adjustments-label { font-family: "Audiowide", sans-serif; font-size: 14px; font-weight: 400; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    /* ── INPUTS ─────────────────────────────────────────── */
+    .field { margin-bottom: .75rem; }
+    .field label {
+      display: block;
+      font-size: 10px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+    input[type="number"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      background: #0d0d0d;
+      border: 1px solid #222;
+      border-radius: 2px;
+      color: #fff;
+      font-family: "Nunito Sans", sans-serif;
+      font-size: 14px;
+      padding: 9px 11px;
+      outline: none;
+    }
+    input:focus, textarea:focus { border-color: var(--red); }
+    input::placeholder, textarea::placeholder { color: #333; }
+    textarea { resize: vertical; font-size: 12px; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: .625rem; }
 
-        /* Gym Presence Indicator */
-        .gym-presence-row { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); border: 1px solid #B1B3B3; border-radius: 2px; padding: 1rem 1.25rem; margin-bottom: 1.75rem; }
-        .gym-presence-label { font-size: 11px; color: #B1B3B3; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .gym-indicator { width: 10px; height: 10px; border-radius: 50%; background: #B1B3B3; }
-        .gym-presence-status { font-size: 14px; font-weight: 600; color: #B1B3B3; }
-        .gym-presence-timestamp { font-size: 10px; color: #666; margin-top: 6px; }
+    /* ── PROGRESS BARS ──────────────────────────────────── */
+    .macro-row { margin-bottom: .75rem; }
+    .macro-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 4px;
+    }
+    .macro-name { font-size: 10px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; }
+    .macro-val  { font-size: 11px; font-weight: 700; color: #fff; }
+    .macro-tgt  { font-size: 10px; color: #3a3a3a; }
+    .bar-track {
+      height: 3px;
+      background: #161616;
+      border: .5px solid #1e1e1e;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .bar-fill { height: 100%; border-radius: 2px; transition: width .4s ease; }
 
-        .gym-presence-row.detected .gym-indicator {
-          background: #00D166;
-          box-shadow: 0 0 12px rgba(0, 209, 102, 0.8);
-          animation: pulse 2s infinite;
-        }
+    /* ── COACH TEXT ─────────────────────────────────────── */
+    .coach-text { font-size: 13px; line-height: 1.7; color: #ccc; }
+    .coach-text strong { color: #fff; font-weight: 700; }
+    .coach-text ul { padding-left: 1.1rem; margin: .4rem 0; }
+    .coach-text li { margin-bottom: .2rem; }
+    .coach-text p  { margin-bottom: .4rem; }
+    .coach-text p:last-child { margin-bottom: 0; }
 
-        .gym-presence-row.detected .gym-presence-status {
-          color: #00D166;
-          text-shadow: 0 0 10px rgba(0, 209, 102, 0.3);
-        }
+    /* ── LOADING ────────────────────────────────────────── */
+    .loading {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #333;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: .75rem 0;
+    }
 
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
+    /* ── STATS GRID ─────────────────────────────────────── */
+    .stats-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: .625rem; margin-bottom: .875rem; }
+    .stat-box {
+      background: linear-gradient(135deg,#0a0a0a,#141414);
+      border: 1px solid #1e1e1e;
+      border-radius: 2px;
+      padding: .75rem .625rem;
+      text-align: center;
+    }
+    .stat-val { font-size: 22px; font-weight: 700; color: #fff; line-height: 1; margin-bottom: 4px; }
+    .stat-lbl { font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: .5px; }
 
-        .gym-presence-row.waiting .gym-presence-status {
-          color: #666;
-          opacity: 0.6;
-        }
+    /* ── SLEEP STAGES ───────────────────────────────────── */
+    .stages { display: grid; grid-template-columns: 1fr 1fr; gap: .625rem; }
+    .stage {
+      background: #080808;
+      border: 1px solid #1a1a1a;
+      border-radius: 2px;
+      padding: .625rem;
+    }
+    .stage-lbl { font-size: 9px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+    .stage-val { font-size: 17px; font-weight: 700; color: #fff; }
 
-        /* Oura Ring Status */
-        .oura-status-row { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); border: 1px solid #B1B3B3; border-radius: 2px; padding: 0.875rem 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
-        .oura-status-left { display: flex; align-items: center; gap: 10px; }
-        .oura-dot { width: 10px; height: 10px; border-radius: 50%; background: #B1B3B3; flex-shrink: 0; }
-        .oura-dot.connected { background: #00D166; box-shadow: 0 0 10px rgba(0, 209, 102, 0.7); }
-        .oura-dot.loading { background: #FFCC00; animation: pulse 1.5s infinite; }
-        .oura-label { font-size: 11px; color: #B1B3B3; text-transform: uppercase; letter-spacing: 1px; }
-        .oura-label.connected { color: #00D166; }
-        .oura-scores { display: flex; gap: 12px; }
-        .oura-score-item { text-align: right; }
-        .oura-score-value { font-size: 14px; font-weight: 700; color: #fff; }
-        .oura-score-label { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
-    </style>
+    /* ── TREND BARS ─────────────────────────────────────── */
+    .trend-wrap { display: flex; align-items: flex-end; gap: 3px; height: 36px; margin: .5rem 0; }
+    .t-bar { flex: 1; background: var(--red); opacity: .4; border-radius: 1px 1px 0 0; min-height: 3px; }
+    .t-bar.today { opacity: 1; }
+    .trend-labels { display: flex; margin-top: 3px; }
+    .trend-labels span { flex: 1; text-align: center; font-size: 8px; color: #3a3a3a; }
+
+    /* ── VIDEO GRID ─────────────────────────────────────── */
+    .cat-scroll {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 7px;
+      margin-bottom: .875rem;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .cat-scroll::-webkit-scrollbar { display: none; }
+    .cat-pill {
+      flex-shrink: 0;
+      padding: 4px 11px;
+      border-radius: 20px;
+      border: 1px solid #1e1e1e;
+      background: transparent;
+      color: #444;
+      font-family: "Nunito Sans", sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      transition: all .15s;
+    }
+    .cat-pill.active { background: var(--red); border-color: var(--red); color: #000; }
+
+    .vid-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .625rem; }
+    .vid-card {
+      background: linear-gradient(135deg,#0a0a0a,#141414);
+      border: 1px solid #1e1e1e;
+      border-radius: 2px;
+      overflow: hidden;
+      text-decoration: none;
+      display: block;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .vid-card:active { opacity: .7; }
+    .vid-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #111; }
+    .vid-info  { padding: .5rem; }
+    .vid-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 5px;
+    }
+    .vid-meta { display: flex; gap: 3px; flex-wrap: wrap; }
+
+    /* ── HISTORY ROWS ───────────────────────────────────── */
+    .hist-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .5rem 0;
+      border-bottom: 1px solid #111;
+    }
+    .hist-row:last-child { border-bottom: none; }
+
+    /* ── ALERT STRIPS ───────────────────────────────────── */
+    .alert {
+      padding: .625rem .875rem;
+      border-radius: 2px;
+      margin-bottom: .875rem;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .alert-red    { background: rgba(237,28,36,.08);  border: 1px solid rgba(237,28,36,.25);  color: var(--red); }
+    .alert-yellow { background: rgba(255,204,0,.08);  border: 1px solid rgba(255,204,0,.25);  color: var(--yellow); }
+    .alert-green  { background: rgba(0,209,102,.08);  border: 1px solid rgba(0,209,102,.25);  color: var(--green); }
+
+    hr.divider { border: none; border-top: 1px solid #111; margin: .875rem 0; }
+  </style>
 </head>
 <body>
-<div class="app">
-  <!-- HOME SCREEN -->
-  <div class="screen active" id="homeScreen">
-    <div class="header">
-      <div class="brand">TRAINAI</div>
-      <div class="subtitle">AI PERFORMANCE CALIBRATION</div>
+<div id="app">
+  <div class="screen-wrap" id="screenWrap">
+
+    <!-- ════════════════════════════════════════════════════
+         SCREEN 1 — COACH
+    ════════════════════════════════════════════════════ -->
+    <div class="screen active" id="sCoach">
+      <div class="s-head">
+        <div class="brand">TRAINAI</div>
+        <div class="s-sub" id="coachDate">—</div>
+      </div>
+
+      <!-- Quick-status badges -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;" id="statusBadges">
+        <span class="badge b-gray" id="bdgDayType">—</span>
+        <span class="badge b-gray" id="bdgGym">GYM —</span>
+        <span class="badge b-gray" id="bdgSleep">SLEEP —</span>
+        <span class="badge b-gray" id="bdgReady">READY —</span>
+      </div>
+
+      <div id="coachLoading" class="loading"><div class="dot dot-red pulse"></div>ANALYZING YOUR DATA…</div>
+      <div id="coachError"   style="display:none;">
+        <div class="alert alert-red">⚡ Coach unavailable — check Anthropic API key in Vercel</div>
+      </div>
+
+      <div id="coachContent" style="display:none;">
+        <div class="card card-accent-green">
+          <div class="card-title"><span class="dot dot-green"></span>NUTRITION</div>
+          <div class="coach-text" id="coachNutrition"></div>
+        </div>
+        <div class="card card-accent-red">
+          <div class="card-title"><span class="dot dot-red"></span>FITNESS</div>
+          <div class="coach-text" id="coachFitness"></div>
+        </div>
+        <div class="card card-accent-purple">
+          <div class="card-title"><span class="dot dot-purple"></span>SLEEP</div>
+          <div class="coach-text" id="coachSleep"></div>
+        </div>
+        <button class="btn btn-full" onclick="loadCoach(true)" id="refreshBtn">↻ REFRESH ANALYSIS</button>
+      </div>
     </div>
 
-    <div class="metric-card">
-      <div class="metric-grid">
-        <div class="metric-item">
-          <div class="metric-label">
-            <div class="status-dot" id="sleepDot"></div>
-            <span>SLEEP</span>
+    <!-- ════════════════════════════════════════════════════
+         SCREEN 2 — NUTRITION
+    ════════════════════════════════════════════════════ -->
+    <div class="screen" id="sNutrition">
+      <div class="s-head">
+        <div class="s-title">NUTRITION</div>
+        <div class="s-sub" id="nutDate">—</div>
+      </div>
+
+      <!-- Targets (from coach) -->
+      <div class="card">
+        <div class="card-title">TODAY'S TARGETS</div>
+        <div id="nutTargets" style="font-size:12px;color:var(--gray);">
+          <div class="loading"><div class="dot dot-dim pulse"></div>LOADING…</div>
+        </div>
+      </div>
+
+      <!-- Logged today with progress bars -->
+      <div class="card">
+        <div class="card-title">LOGGED TODAY</div>
+        <div id="nutLogged">
+          <div class="loading"><div class="dot dot-dim pulse"></div>LOADING…</div>
+        </div>
+      </div>
+
+      <!-- Quick entry -->
+      <div class="card">
+        <div class="card-title">QUICK LOG</div>
+        <div class="row-2">
+          <div class="field"><label>Calories</label><input type="number" id="eCalories" placeholder="2800"></div>
+          <div class="field"><label>Protein (g)</label><input type="number" id="eProtein" placeholder="145"></div>
+        </div>
+        <div class="row-2">
+          <div class="field"><label>Carbs (g)</label><input type="number" id="eCarbs" placeholder="400"></div>
+          <div class="field"><label>Fat (g)</label><input type="number" id="eFat" placeholder="95"></div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="logNutrition()">LOG NOW</button>
+        <div id="nutLogMsg" style="font-size:11px;color:var(--green);margin-top:8px;display:none;"></div>
+      </div>
+
+      <!-- 7-day history -->
+      <div class="card">
+        <div class="card-title">7-DAY HISTORY</div>
+        <div id="nutHistory">
+          <div class="loading"><div class="dot dot-dim pulse"></div>LOADING…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════
+         SCREEN 3 — FITNESS
+    ════════════════════════════════════════════════════ -->
+    <div class="screen" id="sFitness">
+      <div class="s-head">
+        <div class="s-title">FITNESS</div>
+        <div class="s-sub" id="fitDate">—</div>
+      </div>
+
+      <!-- Day status -->
+      <div class="card">
+        <div class="card-title">TODAY</div>
+        <div id="fitStatus">
+          <div class="loading"><div class="dot dot-dim pulse"></div></div>
+        </div>
+      </div>
+
+      <!-- Coach rec -->
+      <div class="card card-accent-red">
+        <div class="card-title"><span class="dot dot-red"></span>COACH RECOMMENDATION</div>
+        <div class="coach-text" id="fitCoachText">
+          <div class="loading"><div class="dot dot-dim pulse"></div></div>
+        </div>
+      </div>
+
+      <!-- Video library -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;">
+          <div class="s-title" style="font-size:12px;">VIDEO LIBRARY</div>
+          <button class="btn btn-sm" id="syncBtn" onclick="syncVideos()">SYNC PLAYLIST</button>
+        </div>
+        <div class="cat-scroll" id="catPills"></div>
+        <div class="vid-grid" id="vidGrid">
+          <div class="loading" style="grid-column:1/-1"><div class="dot dot-dim pulse"></div>LOAD VIDEOS</div>
+        </div>
+        <div id="vidSyncMsg" style="font-size:11px;margin-top:8px;display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════
+         SCREEN 4 — SLEEP
+    ════════════════════════════════════════════════════ -->
+    <div class="screen" id="sSleep">
+      <div class="s-head">
+        <div class="s-title">SLEEP</div>
+        <div class="s-sub" id="sleepDate">—</div>
+      </div>
+
+      <div class="stats-3">
+        <div class="stat-box"><div class="stat-val" id="slScore">—</div><div class="stat-lbl">Sleep</div></div>
+        <div class="stat-box"><div class="stat-val" id="slReady">—</div><div class="stat-lbl">Readiness</div></div>
+        <div class="stat-box"><div class="stat-val" id="slSpo2">—</div><div class="stat-lbl">SpO2 %</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">LAST NIGHT</div>
+        <div id="slBreakdown">
+          <div class="loading"><div class="dot dot-dim pulse"></div>LOADING…</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">HEART RATE & HRV</div>
+        <div id="slHR"><div class="loading"><div class="dot dot-dim pulse"></div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">7-DAY SLEEP TREND</div>
+        <div id="slTrend"></div>
+      </div>
+
+      <div class="card card-accent-purple">
+        <div class="card-title"><span class="dot dot-purple"></span>COACH INTERPRETATION</div>
+        <div class="coach-text" id="slCoachText">
+          <div class="loading"><div class="dot dot-dim pulse"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════
+         SCREEN 5 — LOG
+    ════════════════════════════════════════════════════ -->
+    <div class="screen" id="sLog">
+      <div class="s-head">
+        <div class="s-title">LOG</div>
+        <div class="s-sub">WEIGHT · GYM · CSV</div>
+      </div>
+
+      <!-- Weight -->
+      <div class="card">
+        <div class="card-title">WEIGHT LOG</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.75rem;">
+          <div>
+            <div style="font-size:10px;color:var(--gray);margin-bottom:2px;">CURRENT</div>
+            <div style="font-size:26px;font-weight:700;" id="wCurrent">— lb</div>
           </div>
-          <div class="metric-value" id="sleepValue">7h</div>
-          <div class="metric-status" id="sleepStatus">OPTIMAL</div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-label">
-            <div class="status-dot" id="energyDot"></div>
-            <span>ENERGY</span>
+          <div style="text-align:right;">
+            <div style="font-size:10px;color:var(--gray);margin-bottom:2px;">GOAL</div>
+            <div style="font-size:18px;font-weight:700;color:var(--green);">160 lb</div>
           </div>
-          <div class="metric-value" id="energyValue">7/10</div>
-          <div class="metric-status" id="energyStatus">PEAK</div>
         </div>
+        <div class="bar-track" style="height:5px;margin-bottom:.875rem;">
+          <div class="bar-fill" id="wProgress" style="width:0%;background:var(--green);"></div>
+        </div>
+        <div style="display:flex;gap:.625rem;align-items:flex-end;">
+          <div class="field" style="flex:1;margin:0;">
+            <label>Weight (lbs)</label>
+            <input type="number" id="wInput" placeholder="147.5" step="0.1">
+          </div>
+          <button class="btn btn-primary" onclick="logWeight()" style="height:40px;margin-bottom:0;">LOG</button>
+        </div>
+        <div id="wLogMsg" style="font-size:11px;color:var(--green);margin-top:8px;display:none;"></div>
       </div>
-      <div style="border-top: 0.5px solid #B1B3B3; padding-top: 1rem; margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-        <div>
-          <div style="font-size: 11px; color: #B1B3B3; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">DAILY STEPS</div>
-          <div style="font-size: 18px; font-weight: 600; color: #fff;" id="stepsValue">8.2k</div>
-        </div>
-        <div>
-          <div style="font-size: 11px; color: #B1B3B3; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px;">RECOVERY</div>
-          <div style="font-size: 18px; font-weight: 600; color: #00D166;" id="recoveryValue">75%</div>
-        </div>
+
+      <div class="card">
+        <div class="card-title">RECENT WEIGH-INS</div>
+        <div id="wHistory"><div class="loading"><div class="dot dot-dim pulse"></div>LOADING…</div></div>
+      </div>
+
+      <!-- Manual gym check-in -->
+      <div class="card">
+        <div class="card-title">GYM CHECK-IN</div>
+        <div style="font-size:12px;color:var(--gray);margin-bottom:.75rem;" id="gymStatusText">Checking…</div>
+        <button class="btn btn-success btn-full" id="gymCheckinBtn" onclick="manualCheckin()">VASA CHECKED IN</button>
+        <div style="font-size:10px;color:#333;margin-top:7px;">Use this if the IFTTT automation didn't fire</div>
+      </div>
+
+      <!-- CSV import -->
+      <div class="card">
+        <div class="card-title">MACROSFIRST CSV IMPORT</div>
+        <div style="font-size:11px;color:var(--gray);margin-bottom:.75rem;">Paste CSV from your MacrosFirst export email</div>
+        <div class="field"><textarea id="csvInput" rows="4" placeholder="Date,Name,Protein,Carbs..."></textarea></div>
+        <button class="btn btn-primary btn-full" onclick="importCSV()">IMPORT</button>
+        <div id="csvMsg" style="font-size:11px;margin-top:8px;display:none;"></div>
       </div>
     </div>
 
-    <div class="oura-status-row" id="ouraStatusRow">
-      <div class="oura-status-left">
-        <div class="oura-dot loading" id="ouraDot"></div>
-        <div class="oura-label" id="ouraLabel">OURA — SYNCING...</div>
-      </div>
-      <div class="oura-scores" id="ouraScores" style="display:none;">
-        <div class="oura-score-item">
-          <div class="oura-score-value" id="ouraSleepScore">—</div>
-          <div class="oura-score-label">Sleep</div>
-        </div>
-        <div class="oura-score-item">
-          <div class="oura-score-value" id="ouraReadinessScore">—</div>
-          <div class="oura-score-label">Readiness</div>
-        </div>
-        <div class="oura-score-item">
-          <div class="oura-score-value" id="ouraActivityScore">—</div>
-          <div class="oura-score-label">Activity</div>
-        </div>
-      </div>
-    </div>
+  </div><!-- /screen-wrap -->
 
-    <div class="btn-container">
-      <button onclick="switchScreen('vitalsScreen')">Update Vitals</button>
-      <button class="primary" onclick="switchScreen('planScreen')">View Plan</button>
-    </div>
-  </div>
-
-  <!-- VITALS SCREEN -->
-  <div class="screen" id="vitalsScreen">
-    <div class="header">
-      <div class="header-audiowide">DIAGNOSTIC INPUT</div>
-      <div class="subtitle" style="margin-top: 0.5rem;">Real-time vitals calibration</div>
-    </div>
-
-    <div class="gym-presence-row waiting" id="gymPresenceRow">
-      <div class="gym-presence-label">
-        <div class="gym-indicator" id="gymIndicator"></div>
-        <span>GYM PRESENCE</span>
-      </div>
-      <div class="gym-presence-status" id="gymPresenceStatus">WAITING FOR CHECK-IN...</div>
-      <div class="gym-presence-timestamp" id="gymPresenceTimestamp"></div>
-    </div>
-
-    <div class="slider-group">
-      <label class="slider-label">SLEEP DURATION: <span id="sleepVal">7</span>h</label>
-      <input type="range" id="sleepSlider" min="3" max="12" value="7" onchange="updateTempVital('sleep', this.value)">
-      <div class="slider-hint">Target: 7-9 hours optimal</div>
-    </div>
-
-    <div class="slider-group energy">
-      <label class="slider-label">ENERGY LEVEL: <span id="energyVal">7</span>/10</label>
-      <input type="range" id="energySlider" min="1" max="10" value="7" onchange="updateTempVital('energy', this.value)">
-      <div class="slider-hint">How energized are you?</div>
-    </div>
-
-    <div class="slider-group nutrition">
-      <label class="slider-label">NUTRITION STATUS: <span id="nutritionVal">8</span>/10</label>
-      <input type="range" id="nutritionSlider" min="1" max="10" value="8" onchange="updateTempVital('nutrition', this.value)">
-      <div class="slider-hint">Quality of fuel today</div>
-    </div>
-
-    <div class="slider-group pain">
-      <label class="slider-label">PAIN INDICATORS: <span id="painVal">2</span>/10</label>
-      <input type="range" id="painSlider" min="0" max="10" value="2" onchange="updateTempVital('pain', this.value)">
-      <div class="slider-hint">Any nagging issues or soreness?</div>
-    </div>
-
-    <div class="btn-container">
-      <button onclick="switchScreen('homeScreen')">Cancel</button>
-      <button class="primary" onclick="saveVitals(); switchScreen('planScreen');">Calibrate</button>
-    </div>
-  </div>
-
-  <!-- PLAN SCREEN -->
-  <div class="screen" id="planScreen">
-    <div class="header">
-      <div class="header-audiowide">ADAPTIVE PROTOCOL</div>
-      <div class="subtitle" style="margin-top: 0.5rem;">AI-Calibrated Training Plan</div>
-    </div>
-
-    <div class="duration-card">
-      <div class="duration-label">Recommended Duration</div>
-      <div class="duration-value">60 MIN</div>
-      <div class="duration-type">Upper Body Strength + Core</div>
-    </div>
-
-    <div class="adjustments-label">DIAGNOSTIC ADJUSTMENTS</div>
-    <div id="adjustmentsList"></div>
-
-    <div class="advisory">
-      <div class="advisory-title">✓ SYSTEM ADVISORY</div>
-      <div class="advisory-text">Update vitals before each session for maximum precision. AI calibration improves with consistent data input across your training cycle.</div>
-    </div>
-
-    <div class="btn-container">
-      <button onclick="switchScreen('homeScreen')">Back</button>
-      <button class="success">Execute Protocol</button>
-    </div>
-  </div>
-</div>
+  <!-- ── BOTTOM NAV ─────────────────────────────────────── -->
+  <nav id="bottomNav">
+    <button class="nav-tab active" onclick="switchTab('sCoach',this)">
+      <div class="nav-icon">⚡</div><span>Coach</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('sNutrition',this)">
+      <div class="nav-icon">🥗</div><span>Nutrition</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('sFitness',this)">
+      <div class="nav-icon">💪</div><span>Fitness</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('sSleep',this)">
+      <div class="nav-icon">🌙</div><span>Sleep</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('sLog',this)">
+      <div class="nav-icon">📋</div><span>Log</span>
+    </button>
+  </nav>
+</div><!-- /app -->
 
 <script>
-let vitals = { sleep: 7, energy: 7, nutrition: 8, pain: 2, steps: 8245, recovery: 75 };
-let tempVitals = { ...vitals };
-let workoutState = { gymDetected: false, gymCheckInTime: null, workoutIntensity: 'Standard' };
+// ── STATE ──────────────────────────────────────────────────────────────────────
+const S = { coach:null, nutrition:null, oura:null, videos:null, weight:null, videoCat:'all' };
 
-async function fetchGymCheckInStatus() {
-  try {
-    const response = await fetch('/api/workout', { method: 'GET' });
-    const data = await response.json();
-    if (data.detected && data.data) {
-      workoutState.gymDetected = true;
-      workoutState.gymCheckInTime = data.data.timestamp;
-      updateGymPresenceUI(true, data.data);
-      autoAdjustWorkoutForGym();
+// ── DATE LABELS ────────────────────────────────────────────────────────────────
+const dateLabel = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();
+document.querySelectorAll('#coachDate,#nutDate,#fitDate,#sleepDate').forEach(el=>el.textContent=dateLabel);
+
+// ── NAV ────────────────────────────────────────────────────────────────────────
+function switchTab(id, tabEl) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  tabEl.classList.add('active');
+  document.getElementById('screenWrap').scrollTop = 0;
+  if (id==='sNutrition') initNutrition();
+  if (id==='sFitness')   initFitness();
+  if (id==='sSleep')     initSleep();
+  if (id==='sLog')       initLog();
+}
+
+// ── MARKDOWN → HTML ────────────────────────────────────────────────────────────
+function md(text) {
+  if (!text) return '';
+  let html = text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  const lines = html.split('\n');
+  const out = []; let inList = false;
+  for (const line of lines) {
+    const t = line.trim();
+    if (t.startsWith('- ')||t.startsWith('• ')) {
+      if (!inList) { out.push('<ul>'); inList=true; }
+      out.push(`<li>${t.slice(2)}</li>`);
     } else {
-      workoutState.gymDetected = false;
-      updateGymPresenceUI(false);
+      if (inList) { out.push('</ul>'); inList=false; }
+      if (t) out.push(`<p>${t}</p>`);
     }
-  } catch (error) {
-    console.log('Gym check-in status fetch error:', error.message);
-    updateGymPresenceUI(false);
+  }
+  if (inList) out.push('</ul>');
+  return out.join('');
+}
+
+// ── MACRO BAR ──────────────────────────────────────────────────────────────────
+function macroBar(name, val, target, unit, color) {
+  const pct = Math.min(100, Math.round((val/target)*100));
+  return `<div class="macro-row">
+    <div class="macro-header">
+      <span class="macro-name">${name}</span>
+      <span class="macro-val">${Math.round(val)}${unit} <span class="macro-tgt">/ ${target}${unit}</span></span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color};"></div></div>
+  </div>`;
+}
+
+// ── SCORE COLOR ────────────────────────────────────────────────────────────────
+function scoreColor(score) {
+  if (score==null) return '#fff';
+  return score>=80 ? 'var(--green)' : score>=60 ? 'var(--yellow)' : 'var(--red)';
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// COACH
+// ════════════════════════════════════════════════════════════════════════════════
+async function loadCoach(force=false) {
+  if (S.coach && !force) { renderCoach(S.coach); return; }
+  document.getElementById('coachLoading').style.display='flex';
+  document.getElementById('coachContent').style.display='none';
+  document.getElementById('coachError').style.display='none';
+  if (force) {
+    const btn=document.getElementById('refreshBtn');
+    btn.textContent='ANALYZING…'; btn.disabled=true;
+  }
+  try {
+    const r = await fetch('/api/coach');
+    if (!r.ok) throw new Error(r.status);
+    S.coach = await r.json();
+    renderCoach(S.coach);
+  } catch {
+    document.getElementById('coachLoading').style.display='none';
+    document.getElementById('coachError').style.display='block';
+  }
+  if (force) {
+    const btn=document.getElementById('refreshBtn');
+    btn.textContent='↻ REFRESH ANALYSIS'; btn.disabled=false;
   }
 }
 
-function updateGymPresenceUI(detected, checkInData = null) {
-  const row = document.getElementById('gymPresenceRow');
-  const status = document.getElementById('gymPresenceStatus');
-  const timestamp = document.getElementById('gymPresenceTimestamp');
-  if (detected && checkInData) {
-    row.classList.remove('waiting');
-    row.classList.add('detected');
-    status.textContent = `DETECTED: ${checkInData.gym}`;
-    const checkInTime = new Date(checkInData.timestamp);
-    const timeStr = checkInTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    timestamp.textContent = `Check-in at ${timeStr}`;
-  } else {
-    row.classList.add('waiting');
-    row.classList.remove('detected');
-    status.textContent = 'WAITING FOR CHECK-IN...';
-    timestamp.textContent = '';
+function renderCoach(d) {
+  document.getElementById('coachLoading').style.display='none';
+  document.getElementById('coachError').style.display='none';
+  document.getElementById('coachContent').style.display='block';
+
+  // Badges
+  const dayLabel = (d.day_type||'').replace(/_/g,' ').toUpperCase();
+  document.getElementById('bdgDayType').textContent = dayLabel||'—';
+  document.getElementById('bdgDayType').className = 'badge b-red';
+
+  const gymBdg = document.getElementById('bdgGym');
+  gymBdg.textContent = d.gym_detected ? 'GYM ✓' : 'GYM —';
+  gymBdg.className   = d.gym_detected ? 'badge b-green' : 'badge b-gray';
+
+  updateOuraBadges();
+
+  document.getElementById('coachNutrition').innerHTML = md(d.coaching?.nutrition||'');
+  document.getElementById('coachFitness').innerHTML   = md(d.coaching?.fitness||'');
+  document.getElementById('coachSleep').innerHTML     = md(d.coaching?.sleep||'');
+
+  // Feed sibling screens if already mounted
+  const fc=document.getElementById('fitCoachText');
+  if (fc) fc.innerHTML = md(d.coaching?.fitness||'');
+  const sc=document.getElementById('slCoachText');
+  if (sc) sc.innerHTML = md(d.coaching?.sleep||'');
+}
+
+function updateOuraBadges() {
+  if (!S.oura) return;
+  const ss = S.oura.sleep?.score;
+  const rs = S.oura.readiness?.score;
+  if (ss!=null) {
+    const el=document.getElementById('bdgSleep');
+    el.textContent=`SLEEP ${ss}`;
+    el.className=`badge ${ss>=80?'b-green':ss>=60?'b-yellow':'b-red'}`;
+  }
+  if (rs!=null) {
+    const el=document.getElementById('bdgReady');
+    el.textContent=`READY ${rs}`;
+    el.className=`badge ${rs>=80?'b-green':rs>=60?'b-yellow':'b-red'}`;
   }
 }
 
-function autoAdjustWorkoutForGym() {
-  document.querySelector('.duration-value').textContent = '60 MIN';
-  document.querySelector('.duration-type').textContent = 'Gym Session - High Intensity';
-  workoutState.workoutIntensity = 'High';
-}
-
-function switchScreen(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
-  if (screenId === 'vitalsScreen') fetchGymCheckInStatus();
-  if (screenId === 'planScreen') renderAdjustments();
-}
-
-function updateTempVital(key, value) {
-  tempVitals[key] = parseInt(value);
-  document.getElementById(key + 'Val').textContent = value;
-}
-
-function saveVitals() {
-  vitals = { ...tempVitals };
-  updateHomeDisplay();
-}
-
-function getSleepStatus(h) {
-  if (h >= 7 && h <= 9) return { color: '#00D166', label: 'OPTIMAL' };
-  if (h >= 6 || h <= 10) return { color: '#FFCC00', label: 'ADEQUATE' };
-  return { color: '#ED1C24', label: 'COMPROMISED' };
-}
-
-function getEnergyStatus(e) {
-  if (e >= 7) return { color: '#00D166', label: 'PEAK' };
-  if (e >= 5) return { color: '#FFCC00', label: 'MODERATE' };
-  return { color: '#ED1C24', label: 'DEPLETED' };
-}
-
-function updateHomeDisplay() {
-  const sleepStatus = getSleepStatus(vitals.sleep);
-  const energyStatus = getEnergyStatus(vitals.energy);
-  document.getElementById('sleepValue').textContent = vitals.sleep + 'h';
-  document.getElementById('sleepStatus').textContent = sleepStatus.label;
-  document.getElementById('sleepDot').style.background = sleepStatus.color;
-  document.getElementById('sleepDot').style.boxShadow = `0 0 12px ${sleepStatus.color}`;
-  document.getElementById('energyValue').textContent = vitals.energy + '/10';
-  document.getElementById('energyStatus').textContent = energyStatus.label;
-  document.getElementById('energyDot').style.background = energyStatus.color;
-  document.getElementById('energyDot').style.boxShadow = `0 0 12px ${energyStatus.color}`;
-  document.getElementById('stepsValue').textContent = (vitals.steps / 1000).toFixed(1) + 'k';
-  document.getElementById('recoveryValue').textContent = vitals.recovery + '%';
-}
-
-function renderAdjustments() {
-  const adjustments = [];
-  if (workoutState.gymDetected) {
-    adjustments.push({ trigger: 'GYM DETECTED', adjustment: 'HIGH INTENSITY SESSION ENABLED', details: 'Gym presence confirmed. System locked to 60 minute high-performance protocol.', color: '#00D166' });
+// ════════════════════════════════════════════════════════════════════════════════
+// NUTRITION
+// ════════════════════════════════════════════════════════════════════════════════
+async function initNutrition() {
+  if (S.coach?.targets) renderNutTargets(S.coach.targets);
+  try {
+    const r = await fetch('/api/nutrition');
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    S.nutrition = d;
+    renderNutLogged(d);
+    renderNutHistory(d);
+  } catch {
+    document.getElementById('nutLogged').innerHTML = '<div style="font-size:12px;color:#555;">Could not load nutrition data</div>';
+    document.getElementById('nutHistory').innerHTML = '<div style="font-size:12px;color:#555;">No history</div>';
   }
-  if (vitals.sleep < 6) {
-    adjustments.push({ trigger: `${vitals.sleep}h SLEEP`, adjustment: 'REDUCE VOLUME 35%', details: 'Lower intensity. Focus recovery protocols.', color: '#ED1C24' });
-  } else if (vitals.sleep < 7) {
-    adjustments.push({ trigger: `${vitals.sleep}h SLEEP`, adjustment: 'REDUCE VOLUME 25%', details: 'Extend rest periods by 30 seconds.', color: '#FFCC00' });
-  } else if (vitals.sleep >= 8) {
-    adjustments.push({ trigger: `${vitals.sleep}h SLEEP`, adjustment: 'INCREASE INTENSITY 15%', details: 'Add extra volume. Reduce rest intervals.', color: '#00D166' });
+}
+
+function renderNutTargets(t) {
+  const [cL,cH]=t.calories_kcal, [pL,pH]=t.protein_g, [carL,carH]=t.carbs_g, [fL,fH]=t.fat_g;
+  document.getElementById('nutTargets').innerHTML=`
+    <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:4px;">${cL}–${cH} <span style="font-size:12px;font-weight:400;color:var(--gray);">kcal</span></div>
+    <div style="font-size:11px;color:var(--gray);">Protein ${pL}–${pH}g &nbsp;·&nbsp; Carbs ${carL}–${carH}g &nbsp;·&nbsp; Fat ${fL}–${fH}g</div>
+  `;
+}
+
+function renderNutLogged(data) {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const entry = data.days?.find(d=>d.date===todayStr);
+  const targets = S.coach?.targets;
+  const calTgt = targets?.calories_kcal?.[0] ?? 3000;
+  const pTgt   = targets?.protein_g?.[1]   ?? 160;
+  const cTgt   = targets?.carbs_g?.[1]     ?? 450;
+  const fTgt   = targets?.fat_g?.[1]       ?? 110;
+
+  if (!entry) {
+    document.getElementById('nutLogged').innerHTML=`<div class="alert alert-yellow" style="margin:0;">⚠ Nothing logged yet today — use Quick Log below</div>`;
+    return;
   }
-  if (vitals.energy < 4) {
-    adjustments.push({ trigger: 'ENERGY DEPLETED', adjustment: 'SWITCH TO LIGHT CARDIO', details: 'Skip heavy compounds. Mobilization focus.', color: '#ED1C24' });
-  } else if (vitals.energy < 6) {
-    adjustments.push({ trigger: 'ENERGY MODERATE', adjustment: 'REDUCE MAX ATTEMPTS', details: 'Focus form and controlled cadence.', color: '#FFCC00' });
+  const gap = Math.round(calTgt - entry.calories);
+  const gapHtml = gap>0
+    ? `<span class="badge b-red">${gap} KCAL SHORT</span>`
+    : `<span class="badge b-green">ON TARGET</span>`;
+  document.getElementById('nutLogged').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.875rem;">
+      <div style="font-size:26px;font-weight:700;">${Math.round(entry.calories)} <span style="font-size:12px;font-weight:400;color:var(--gray);">kcal</span></div>
+      ${gapHtml}
+    </div>
+    ${macroBar('PROTEIN', entry.protein_g, pTgt, 'g', 'var(--purple)')}
+    ${macroBar('CARBS',   entry.carbs_g,   cTgt, 'g', 'var(--yellow)')}
+    ${macroBar('FAT',     entry.fat_g,     fTgt, 'g', '#FF8C00')}
+    <div style="font-size:10px;color:#333;margin-top:5px;">Source: ${entry.source}</div>
+  `;
+}
+
+function renderNutHistory(data) {
+  if (!data.days?.length) {
+    document.getElementById('nutHistory').innerHTML='<div style="font-size:12px;color:#555;">No recent data</div>';
+    return;
   }
-  if (vitals.nutrition < 5) {
-    adjustments.push({ trigger: 'NUTRITION DEFICIT', adjustment: 'CAP SESSION 45 MIN', details: 'Insufficient fuel. Limit metabolic demand.', color: '#ED1C24' });
-  } else if (vitals.nutrition >= 8) {
-    adjustments.push({ trigger: 'NUTRITION OPTIMAL', adjustment: 'ENABLE VOLUME BOOST', details: 'Maximum capacity. Add accessory work.', color: '#00D166' });
-  }
-  if (vitals.pain > 5) {
-    adjustments.push({ trigger: `PAIN LEVEL ${vitals.pain}/10`, adjustment: 'MODIFY RANGE OF MOTION', details: 'Avoid stress patterns. Adjust joint angles.', color: '#ED1C24' });
-  }
-  if (adjustments.length === 0 || (adjustments.length === 1 && workoutState.gymDetected)) {
-    adjustments.push({ trigger: 'CONDITIONS OPTIMAL', adjustment: 'EXECUTE FULL PROGRAM', details: 'All systems nominal. Standard protocol.', color: '#00D166' });
-  }
-  let html = '';
-  adjustments.forEach(adj => {
-    html += `
-      <div class="adjustment-item" style="border-color: ${adj.color}40; border-left-color: ${adj.color};">
-        <div class="adjustment-trigger" style="color: ${adj.color}; background: ${adj.color}15; border-color: ${adj.color}30;">${adj.trigger}</div>
-        <div class="adjustment-title">${adj.adjustment}</div>
-        <div class="adjustment-detail">${adj.details}</div>
+  document.getElementById('nutHistory').innerHTML = data.days.map(d=>`
+    <div class="hist-row">
+      <div>
+        <div style="font-size:12px;font-weight:600;">${d.date}</div>
+        <div style="font-size:10px;color:#444;">${d.source}</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:13px;font-weight:700;">${Math.round(d.calories)} kcal</div>
+        <div style="font-size:10px;color:var(--gray);">P:${Math.round(d.protein_g)}g C:${Math.round(d.carbs_g)}g F:${Math.round(d.fat_g)}g</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function logNutrition() {
+  const cal=parseFloat(document.getElementById('eCalories').value);
+  if (!cal) { alert('Enter calories'); return; }
+  const body={
+    type:'daily_entry',
+    date: new Date().toISOString().split('T')[0],
+    calories:cal,
+    protein_g: parseFloat(document.getElementById('eProtein').value)||0,
+    carbs_g:   parseFloat(document.getElementById('eCarbs').value)||0,
+    fat_g:     parseFloat(document.getElementById('eFat').value)||0,
+  };
+  try {
+    const r=await fetch('/api/nutrition',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if (!r.ok) throw new Error();
+    const msg=document.getElementById('nutLogMsg');
+    msg.textContent='✓ Logged'; msg.style.display='block';
+    setTimeout(()=>msg.style.display='none',3000);
+    ['eCalories','eProtein','eCarbs','eFat'].forEach(id=>document.getElementById(id).value='');
+    S.nutrition=null;
+    initNutrition();
+  } catch { alert('Failed to log'); }
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// FITNESS
+// ════════════════════════════════════════════════════════════════════════════════
+const CATS = [
+  {k:'all',l:'All'},{k:'strength_back',l:'Back'},{k:'strength_chest',l:'Chest'},
+  {k:'strength_shoulders',l:'Shoulders'},{k:'strength_arms',l:'Arms'},
+  {k:'strength_legs',l:'Legs'},{k:'strength_core',l:'Core'},
+  {k:'hip_mobility',l:'Hip Mob'},{k:'shoulder_mobility',l:'Shoulder Mob'},
+  {k:'spine_mobility',l:'Spine Mob'},{k:'full_body_flexibility',l:'Flexibility'},
+  {k:'cardio_conditioning',l:'Cardio'},{k:'posture',l:'Posture'},{k:'general_fitness',l:'General'},
+];
+
+async function initFitness() {
+  // Coach data
+  if (S.coach) {
+    const gym=S.coach.gym_detected;
+    const day=(S.coach.day_type||'').replace(/_/g,' ').toUpperCase();
+    document.getElementById('fitStatus').innerHTML=`
+      <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">
+        <span class="badge b-red">${day}</span>
+        <span class="badge ${gym?'b-green':'b-gray'}">${gym?'✓ VASA DETECTED':'NO GYM DETECTED'}</span>
       </div>
     `;
-  });
-  document.getElementById('adjustmentsList').innerHTML = html;
+    document.getElementById('fitCoachText').innerHTML=md(S.coach.coaching?.fitness||'');
+  }
+  // Category pills (build once)
+  if (!document.getElementById('catPills').children.length) {
+    document.getElementById('catPills').innerHTML=CATS.map(c=>`
+      <button class="cat-pill ${c.k==='all'?'active':''}"
+              onclick="filterVids('${c.k}',this)">${c.l}</button>
+    `).join('');
+  }
+  if (!S.videos) await loadVideos('all');
 }
 
-async function fetchOuraData() {
+async function loadVideos(cat) {
+  const grid=document.getElementById('vidGrid');
+  grid.innerHTML='<div class="loading" style="grid-column:1/-1"><div class="dot dot-dim pulse"></div>LOADING…</div>';
   try {
-    const response = await fetch('/api/oura');
-    const data = await response.json();
-    if (data.error) { setOuraStatus('error'); return; }
-    if (data.sleep?.hours != null) {
-      vitals.sleep = data.sleep.hours;
-      tempVitals.sleep = vitals.sleep;
-      document.getElementById('sleepSlider').value = vitals.sleep;
-      document.getElementById('sleepVal').textContent = vitals.sleep;
-    }
-    if (data.activity?.steps != null) {
-      vitals.steps = data.activity.steps;
-      tempVitals.steps = vitals.steps;
-    }
-    if (data.readiness?.score != null) {
-      vitals.recovery = data.readiness.score;
-      tempVitals.recovery = vitals.recovery;
-    }
-    updateHomeDisplay();
-    const dot = document.getElementById('ouraDot');
-    const label = document.getElementById('ouraLabel');
-    const scores = document.getElementById('ouraScores');
-    dot.classList.remove('loading');
-    dot.classList.add('connected');
-    label.classList.add('connected');
-    label.textContent = 'OURA — CONNECTED';
-    scores.style.display = 'flex';
-    if (data.sleep?.score != null) document.getElementById('ouraSleepScore').textContent = data.sleep.score;
-    if (data.readiness?.score != null) document.getElementById('ouraReadinessScore').textContent = data.readiness.score;
-    if (data.activity?.score != null) document.getElementById('ouraActivityScore').textContent = data.activity.score;
-  } catch (error) {
-    setOuraStatus('error');
-    console.log('Oura fetch error:', error.message);
+    const url=cat&&cat!=='all'?`/api/videos?category=${cat}`:'/api/videos';
+    const r=await fetch(url);
+    if (!r.ok) throw new Error();
+    const d=await r.json();
+    S.videos=d;
+    renderVids(d.videos||[]);
+  } catch {
+    grid.innerHTML='<div style="grid-column:1/-1;font-size:12px;color:#555;padding:.75rem 0;">No videos indexed — tap SYNC PLAYLIST</div>';
   }
 }
 
-function setOuraStatus(state) {
-  const dot = document.getElementById('ouraDot');
-  const label = document.getElementById('ouraLabel');
-  dot.classList.remove('loading', 'connected');
-  if (state === 'error') label.textContent = 'OURA — UNAVAILABLE';
+function filterVids(cat,btn) {
+  S.videoCat=cat;
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  loadVideos(cat);
 }
 
-updateHomeDisplay();
-fetchGymCheckInStatus();
-fetchOuraData();
+function renderVids(videos) {
+  const grid=document.getElementById('vidGrid');
+  if (!videos.length) {
+    grid.innerHTML='<div style="grid-column:1/-1;font-size:12px;color:#555;padding:.75rem 0;">No videos in this category</div>';
+    return;
+  }
+  grid.innerHTML=videos.map(v=>`
+    <a class="vid-card" href="${v.url}" target="_blank" rel="noopener">
+      <img class="vid-thumb" src="${v.thumbnail||''}" alt="" loading="lazy" onerror="this.style.display='none'">
+      <div class="vid-info">
+        <div class="vid-title">${v.title}</div>
+        <div class="vid-meta">
+          ${v.source==='athleanx'?'<span class="badge b-red">AX</span>':v.source==='moves_method'?'<span class="badge b-gray">MM</span>':''}
+          ${v.tags?.[0]?`<span class="badge b-gray">${v.tags[0]}</span>`:''}
+        </div>
+      </div>
+    </a>
+  `).join('');
+}
 
+async function syncVideos() {
+  const btn=document.getElementById('syncBtn');
+  const msg=document.getElementById('vidSyncMsg');
+  btn.textContent='SYNCING…'; btn.disabled=true;
+  msg.style.display='none';
+  try {
+    const r=await fetch('/api/videos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sync'})});
+    const d=await r.json();
+    if (d.ok) {
+      msg.style.display='block'; msg.style.color='var(--green)';
+      const rmv=d.removed>0?` · ${d.removed} removed`:'';
+      msg.textContent=`✓ +${d.added} new videos${rmv} · ${d.total} total`;
+      S.videos=null;
+      await loadVideos(S.videoCat);
+    } else {
+      msg.style.display='block'; msg.style.color='var(--red)';
+      msg.textContent=d.error||'Sync failed';
+    }
+  } catch {
+    msg.style.display='block'; msg.style.color='var(--red)';
+    msg.textContent='Sync failed — check YOUTUBE_API_KEY in Vercel';
+  }
+  btn.textContent='SYNC PLAYLIST'; btn.disabled=false;
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SLEEP
+// ════════════════════════════════════════════════════════════════════════════════
+async function initSleep() {
+  if (!S.oura) {
+    try {
+      const r=await fetch('/api/oura');
+      if (!r.ok) throw new Error();
+      S.oura=await r.json();
+      updateOuraBadges();
+    } catch { S.oura=null; }
+  }
+  renderSleep(S.oura);
+  if (S.coach?.coaching?.sleep) document.getElementById('slCoachText').innerHTML=md(S.coach.coaching.sleep);
+}
+
+function renderSleep(oura) {
+  if (!oura) {
+    ['slBreakdown','slHR'].forEach(id=>document.getElementById(id).innerHTML='<div style="font-size:12px;color:#555;">Oura data unavailable</div>');
+    return;
+  }
+  const sl=oura.sleep||{}, rd=oura.readiness||{}, hr=oura.heart_rate||{};
+  const spo2=oura.spo2?.average;
+
+  // Stats
+  document.getElementById('slScore').textContent=sl.score??'—';
+  document.getElementById('slScore').style.color=scoreColor(sl.score);
+  document.getElementById('slReady').textContent=rd.score??'—';
+  document.getElementById('slReady').style.color=scoreColor(rd.score);
+  document.getElementById('slSpo2').textContent=spo2?`${spo2}%`:'—';
+
+  // Breakdown
+  const fmtTime=iso=>iso?new Date(iso).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}):'—';
+  const minsHM=m=>{if(m==null)return'—';const h=Math.floor(m/60),mi=m%60;return h?`${h}h ${mi}m`:`${mi}m`;};
+  document.getElementById('slBreakdown').innerHTML=`
+    <div style="font-size:12px;color:var(--gray);margin-bottom:.875rem;">
+      ${fmtTime(sl.bedtime_start)} → ${fmtTime(sl.bedtime_end)}
+      &nbsp;·&nbsp;<strong style="color:#fff;">${sl.hours??'—'}h total</strong>
+    </div>
+    <div class="stages">
+      <div class="stage"><div class="stage-lbl">Deep</div><div class="stage-val">${minsHM(sl.deep_minutes)}</div></div>
+      <div class="stage"><div class="stage-lbl">REM</div><div class="stage-val">${minsHM(sl.rem_minutes)}</div></div>
+      <div class="stage"><div class="stage-lbl">Light</div><div class="stage-val">${minsHM(sl.light_minutes)}</div></div>
+      <div class="stage"><div class="stage-lbl">Awake</div><div class="stage-val">${minsHM(sl.awake_minutes)}</div></div>
+    </div>
+  `;
+
+  // HR & HRV
+  document.getElementById('slHR').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+      <div>
+        <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Avg Resting HR</div>
+        <div style="font-size:24px;font-weight:700;">${hr.resting_avg??'—'} <span style="font-size:11px;color:var(--gray);">bpm</span></div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">HRV Balance</div>
+        <div style="font-size:24px;font-weight:700;">${rd.hrv_balance??'—'}</div>
+      </div>
+    </div>
+  `;
+
+  // Trend
+  const trend=oura.trends?.sleep||[];
+  if (trend.length) {
+    const max=Math.max(...trend.map(d=>d.score||0),1);
+    document.getElementById('slTrend').innerHTML=`
+      <div class="trend-wrap">
+        ${trend.map((d,i)=>{
+          const h=Math.round((d.score/max)*36);
+          const today=i===trend.length-1;
+          return `<div class="t-bar ${today?'today':''}" style="height:${h}px;" title="${d.date}: ${d.score}"></div>`;
+        }).join('')}
+      </div>
+      <div class="trend-labels">
+        ${trend.map(d=>`<span>${new Date(d.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'short'})}</span>`).join('')}
+      </div>
+    `;
+  } else {
+    document.getElementById('slTrend').innerHTML='<div style="font-size:12px;color:#555;">No trend data yet</div>';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// LOG
+// ════════════════════════════════════════════════════════════════════════════════
+async function initLog() {
+  // Weight
+  try {
+    const r=await fetch('/api/weight');
+    if (!r.ok) throw new Error();
+    const d=await r.json();
+    S.weight=d;
+    renderWeight(d);
+  } catch {
+    document.getElementById('wHistory').innerHTML='<div style="font-size:12px;color:#555;">No weight data</div>';
+  }
+  // Gym status
+  try {
+    const r=await fetch('/api/workout');
+    const d=await r.json();
+    const gymEl=document.getElementById('gymStatusText');
+    const gymBtn=document.getElementById('gymCheckinBtn');
+    if (d.detected && d.data) {
+      const t=new Date(d.data.timestamp).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+      gymEl.innerHTML=`<span style="color:var(--green);">✓ Checked in at ${t} — VASA FITNESS</span>`;
+      gymBtn.textContent='ALREADY CHECKED IN';
+      gymBtn.disabled=true;
+    } else {
+      gymEl.textContent='No check-in recorded today';
+    }
+  } catch {
+    document.getElementById('gymStatusText').textContent='Status unknown';
+  }
+}
+
+function renderWeight(data) {
+  const latest=data.latest;
+  if (latest) {
+    document.getElementById('wCurrent').textContent=`${latest.weight_lb} lb`;
+    const pct=Math.min(100,Math.max(0,Math.round(((latest.weight_lb-140)/(160-140))*100)));
+    document.getElementById('wProgress').style.width=`${pct}%`;
+  }
+  const history=(data.history||[]).slice(0,10);
+  if (!history.length) {
+    document.getElementById('wHistory').innerHTML='<div style="font-size:12px;color:#555;">No weigh-ins yet</div>';
+    return;
+  }
+  document.getElementById('wHistory').innerHTML=history.map(h=>`
+    <div class="hist-row">
+      <div style="font-size:12px;color:var(--gray);">${h.date}</div>
+      <div style="font-size:15px;font-weight:700;">${h.weight_lb} lb</div>
+    </div>
+  `).join('');
+}
+
+async function logWeight() {
+  const val=parseFloat(document.getElementById('wInput').value);
+  if (!val||val<80||val>400){alert('Enter a valid weight');return;}
+  try {
+    const r=await fetch('/api/weight',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({weight_lb:val})});
+    if (!r.ok) throw new Error();
+    const msg=document.getElementById('wLogMsg');
+    msg.textContent=`✓ ${val} lb logged`; msg.style.display='block';
+    setTimeout(()=>msg.style.display='none',3000);
+    document.getElementById('wInput').value='';
+    S.weight=null;
+    initLog();
+  } catch { alert('Failed to log weight'); }
+}
+
+async function manualCheckin() {
+  const btn=document.getElementById('gymCheckinBtn');
+  btn.textContent='CHECKING IN…'; btn.disabled=true;
+  try {
+    const r=await fetch('/api/workout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event:'vasa_checkin'})});
+    if (!r.ok) throw new Error();
+    document.getElementById('gymStatusText').innerHTML='<span style="color:var(--green);">✓ Manually checked in</span>';
+    btn.textContent='CHECKED IN';
+  } catch {
+    btn.textContent='VASA CHECKED IN'; btn.disabled=false;
+    alert('Check-in failed');
+  }
+}
+
+async function importCSV() {
+  const csv=document.getElementById('csvInput').value.trim();
+  if (!csv){alert('Paste CSV content first');return;}
+  const msg=document.getElementById('csvMsg');
+  msg.style.display='block'; msg.style.color='var(--gray)'; msg.textContent='Importing…';
+  try {
+    const r=await fetch('/api/nutrition',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'batch_csv',csv})});
+    const d=await r.json();
+    if (d.ok) {
+      msg.style.color='var(--green)';
+      const prot=d.skipped_manual_entries>0?` · ${d.skipped_manual_entries} manual entries preserved`:'';
+      msg.textContent=`✓ ${d.saved} days imported${prot}`;
+      document.getElementById('csvInput').value='';
+    } else {
+      msg.style.color='var(--red)'; msg.textContent=d.error||'Import failed';
+    }
+  } catch {
+    msg.style.color='var(--red)'; msg.textContent='Import failed — check CSV format';
+  }
+}
+
+// ── BOOT ───────────────────────────────────────────────────────────────────────
+// Load coach on start, fetch Oura in parallel for badge population
+loadCoach();
+fetch('/api/oura').then(r=>r.json()).then(d=>{S.oura=d;updateOuraBadges();}).catch(()=>{});
+
+// Service Worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(registration => {
-    console.log('Service Worker registered:', registration);
-  }).catch(error => {
-    console.log('Service Worker registration failed:', error);
-  });
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
 }
 </script>
 </body>
