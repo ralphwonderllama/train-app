@@ -416,6 +416,65 @@
     .supp-status { font-size: 11px; font-weight: 700; color: #333; white-space: nowrap; }
     .supp-status.taken  { color: var(--green); }
     .supp-status.missed { color: var(--red); }
+
+    /* ── GROCERY LIST ───────────────────────────────────── */
+    .groc-section { margin-bottom: 1.125rem; }
+    .groc-section-hdr {
+      font-size: 9px;
+      color: #2a2a2a;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      padding-bottom: .375rem;
+      border-bottom: 1px solid #111;
+      margin-bottom: .5rem;
+    }
+    .groc-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: .5rem 0;
+      border-bottom: 1px solid #0a0a0a;
+    }
+    .groc-item:last-child { border-bottom: none; }
+    .groc-emoji { font-size: 16px; flex-shrink: 0; line-height: 1.35; }
+    .groc-info  { flex: 1; }
+    .groc-name  { font-size: 13px; font-weight: 600; color: #fff; }
+    .groc-note  { font-size: 10px; color: #444; margin-top: 2px; line-height: 1.5; }
+    .groc-t2 .groc-name { color: #888; }
+
+    /* ── WEEKLY HITS ────────────────────────────────────── */
+    .hit-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: .5rem 0;
+      border-bottom: 1px solid #0a0a0a;
+    }
+    .hit-row:last-child { border-bottom: none; }
+    .hit-emoji { font-size: 15px; flex-shrink: 0; }
+    .hit-info  { flex: 1; }
+    .hit-name  { font-size: 12px; font-weight: 600; color: #fff; }
+    .hit-sub   { font-size: 9px; color: #444; margin-top: 1px; }
+    .hit-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .hit-count { font-size: 20px; font-weight: 700; color: #fff; min-width: 18px; text-align: center; }
+    .hit-count.met { color: var(--green); text-shadow: 0 0 10px rgba(0,209,102,.4); }
+    .hit-tgt   { font-size: 9px; color: #2a2a2a; }
+    .hit-btn {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 1px solid #1e1e1e;
+      background: #0d0d0d;
+      color: #555;
+      font-size: 17px;
+      line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity .15s;
+    }
+    .hit-btn:active { opacity: .5; }
+    .hit-bar-wrap { height: 2px; background: #111; border-radius: 1px; margin-top: 3px; overflow: hidden; }
+    .hit-bar      { height: 100%; border-radius: 1px; background: var(--green); transition: width .3s ease; }
   </style>
 </head>
 <body>
@@ -747,6 +806,42 @@
       </div>
     </div>
 
+    <!-- ════════════════════════════════════════════════════
+         SCREEN 6 — GROCERY
+    ════════════════════════════════════════════════════ -->
+    <div class="screen" id="sGrocery">
+      <div class="s-head">
+        <div class="s-title">GROCERY</div>
+        <div class="s-sub">SMART NUDGES · YOUR HEALTH PROFILE</div>
+      </div>
+
+      <!-- Weekly anti-inflammatory hits tracker -->
+      <div class="card card-accent-green">
+        <div class="card-title" style="justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:7px;"><span class="dot dot-green"></span>WEEKLY HITS</div>
+          <span style="font-size:9px;color:#333;" id="weekLabel">—</span>
+        </div>
+        <div style="font-size:10px;color:#444;margin-bottom:.875rem;">Tap + to count servings. Targets are weekly minimums. Resets Monday.</div>
+        <div id="weeklyHits"></div>
+        <button class="btn btn-sm" onclick="resetWeeklyHits()" style="margin-top:.75rem;width:100%;color:#222;border-color:#1a1a1a;">RESET THIS WEEK</button>
+      </div>
+
+      <!-- Always stock -->
+      <div class="card">
+        <div class="card-title">ALWAYS STOCK</div>
+        <div style="font-size:10px;color:#444;margin-bottom:.875rem;">Highest-impact items for Hashimoto's · inflammation · gut health · mood</div>
+        <div id="groceryList"></div>
+      </div>
+
+      <button class="btn btn-full" onclick="copyGroceryList()" style="margin-bottom:.875rem;">📋 COPY LIST</button>
+      <div id="groceryCopyMsg" style="font-size:11px;color:var(--green);text-align:center;display:none;margin-bottom:.625rem;">✓ Copied to clipboard</div>
+
+      <div style="font-size:9px;color:#222;text-align:center;padding-bottom:.5rem;line-height:1.8;">
+        Sourced from: Bryan Johnson Blueprint · Dr. Mark Hyman · Bulsiewicz (Fiber Fueled)<br>
+        Mayer (Mind-Gut Connection) · peer-reviewed literature
+      </div>
+    </div>
+
   </div><!-- /screen-wrap -->
 
   <!-- ── BOTTOM NAV ─────────────────────────────────────── -->
@@ -755,16 +850,19 @@
       <div class="nav-icon">⚡</div><span>Coach</span>
     </button>
     <button class="nav-tab" onclick="switchTab('sNutrition',this)">
-      <div class="nav-icon">🥗</div><span>Nutrition</span>
+      <div class="nav-icon">🥗</div><span>Nutr</span>
     </button>
     <button class="nav-tab" onclick="switchTab('sFitness',this)">
-      <div class="nav-icon">💪</div><span>Fitness</span>
+      <div class="nav-icon">💪</div><span>Fit</span>
     </button>
     <button class="nav-tab" onclick="switchTab('sSleep',this)">
       <div class="nav-icon">🌙</div><span>Sleep</span>
     </button>
     <button class="nav-tab" onclick="switchTab('sLog',this)">
       <div class="nav-icon">📋</div><span>Log</span>
+    </button>
+    <button class="nav-tab" onclick="switchTab('sGrocery',this)">
+      <div class="nav-icon">🛒</div><span>Shop</span>
     </button>
   </nav>
 </div><!-- /app -->
@@ -788,6 +886,7 @@ function switchTab(id, tabEl) {
   if (id==='sFitness')   initFitness();
   if (id==='sSleep')     initSleep();
   if (id==='sLog')       initLog();
+  if (id==='sGrocery')   initGrocery();
 }
 
 // ── MARKDOWN → HTML ────────────────────────────────────────────────────────────
@@ -1407,6 +1506,169 @@ async function saveSuppField(fields) {
     const msg = document.getElementById('suppSaveMsg');
     if (msg) { msg.textContent = '✓ Saved'; msg.style.display = 'block'; setTimeout(()=>msg.style.display='none', 1500); }
   } catch { /* silent fail — retry on next save */ }
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// GROCERY
+// ════════════════════════════════════════════════════════════════════════════════
+
+// Weekly hit targets — anti-inflammatory habits to build consistency on
+const WEEKLY_HITS = [
+  { id:'evoo',       emoji:'🫒', name:'High-polyphenol EVOO',        sub:'Use as primary cooking fat + drizzle',          target:7 },
+  { id:'berries',    emoji:'🫐', name:'Berries',                     sub:'Blueberry / blackberry / raspberry',            target:5 },
+  { id:'fermented',  emoji:'🥒', name:'Fermented food serving',      sub:'Sauerkraut · kimchi · coconut yogurt',          target:5 },
+  { id:'cruciferous',emoji:'🥦', name:'Cruciferous vegetables',      sub:'Broccoli · cauliflower · Brussels · kale',      target:3 },
+  { id:'greentea',   emoji:'🍵', name:'Green tea',                   sub:'EGCG — thyroid autoantibody support',           target:5 },
+  { id:'turmeric',   emoji:'🟡', name:'Turmeric + black pepper',     sub:'In shake or cooking — curcumin + piperine',     target:5 },
+  { id:'sauna',      emoji:'🔥', name:'VASA sauna session',          sub:'175°F · 15–20 min · post-workout only',         target:2 },
+];
+
+// Always-stock grocery list — curated for Randy's health profile
+const GROCERY_LIST = [
+  { cat:'ANTI-INFLAMMATORY CORE', items:[
+    { emoji:'🫒', name:'High-polyphenol EVOO', note:'Target >400mg/kg biophenols. Kosterina (Whole Foods/Amazon) or Mina (Costco) are the easiest to find. One better bottle replaces what you\'re probably already buying.', tier:1 },
+    { emoji:'🫐', name:'Frozen mixed berries', note:'Blueberry + blackberry preferred. Frozen = same polyphenols as fresh, more economical. Add to shakes or eat straight.', tier:1 },
+    { emoji:'🐟', name:'Wild salmon or sardines', note:'Pre-formed EPA+DHA — more bioavailable than capsules. Aim 2x/week. Sardines are the most affordable and shelf-stable option.', tier:1 },
+    { emoji:'🍫', name:'Dark chocolate 85%+', note:'Polyphenols + flavanols. Lindt 90% or Trader Joe\'s 85%. Confirm GF on label. 1–2 squares is a serving.', tier:2 },
+  ]},
+  { cat:'GUT HEALTH & MICROBIOME', items:[
+    { emoji:'🥒', name:'Sauerkraut or kimchi', note:'Stanford 2021 RCT showed 10 weeks of fermented foods increased microbiome diversity and reduced IL-6. Keep a jar in the fridge. 1–2 tbsp alongside a meal = done.', tier:1 },
+    { emoji:'🥥', name:'Coconut yogurt (dairy-free)', note:'Live probiotic cultures without lactose. Culina or So Delicious plain. Check label for "live active cultures." Good breakfast base.', tier:1 },
+    { emoji:'💊', name:'Culturelle probiotic', note:'L. rhamnosus GG strain — strongest RCT evidence for gut-brain mood support and microbiome resilience. Found at most pharmacies/Amazon.', tier:2 },
+  ]},
+  { cat:'SPICE STACK (all work in shakes)', items:[
+    { emoji:'🟡', name:'Turmeric (ground)', note:'¼–½ tsp daily. Curcumin inhibits NF-κB — the master inflammation switch. Small RCTs show reduction in thyroid autoantibodies. Requires black pepper.', tier:1 },
+    { emoji:'⚫', name:'Black pepper (coarse)', note:'Piperine increases curcumin bioavailability by 20x. Must be used with turmeric. A pinch is enough.', tier:1 },
+    { emoji:'🫚', name:'Ground ginger', note:'COX inhibitor (same pathway as EVOO). Gut motility support. 1 tsp ground in shakes — mild flavor, easy to include.', tier:1 },
+    { emoji:'🍂', name:'Ceylon cinnamon', note:'½ tsp daily improves insulin sensitivity — directly relevant to your glucose flag (129mg/dL). Ceylon > Cassia (lower coumarin). Tasteless in protein shakes.', tier:1 },
+  ]},
+  { cat:'FIBER DIVERSITY (30 PLANTS/WEEK)', items:[
+    { emoji:'🫘', name:'Red or green lentils', note:'18g protein per cup cooked + prebiotic fiber. SCFA production → gut barrier repair → reduced autoimmune signaling. Easy in soups, stews, or grain bowls — family won\'t notice.', tier:1 },
+    { emoji:'🫘', name:'Chickpeas', note:'Resistant starch (prebiotic) + plant protein. Roast for snacking. Easy addition to any bowl. Also hits the 30-plants-per-week target.', tier:1 },
+    { emoji:'🥦', name:'Broccoli sprouts', note:'Sulforaphane concentration is 20–100x higher than regular broccoli. Activates Nrf2 antioxidant pathway powerfully. Eat raw or add to salads/bowls. Health food stores carry them.', tier:2 },
+  ]},
+  { cat:'THYROID & HASHIMOTO\'S SPECIFIC', items:[
+    { emoji:'🥜', name:'Brazil nuts', note:'2–3 nuts/day ≈ 200mcg selenium. Direct TPOAb-reduction evidence. Already in your protocol — just make sure they stay stocked.', tier:1 },
+    { emoji:'🍵', name:'Green tea (loose leaf or bags)', note:'EGCG: small RCTs show reduction in thyroid autoantibodies. Also NF-κB suppressor. Easy 1–2 cups/day habit, especially in the morning.', tier:1 },
+    { emoji:'🫚', name:'Extra-virgin avocado oil', note:'For high-heat cooking where EVOO would degrade. Smoke point ~520°F vs EVOO\'s 375°F. Mild flavor, GF, family-compatible.', tier:2 },
+  ]},
+];
+
+// ── WEEKLY HITS STATE (localStorage, week-keyed) ─────────────────────────────
+function getWeekKey() {
+  const d = new Date();
+  // Monday of current week (ISO)
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const mon = new Date(d); mon.setDate(diff);
+  return mon.toISOString().split('T')[0];
+}
+
+function loadHitState() {
+  const wk = getWeekKey();
+  try {
+    const raw = localStorage.getItem('trainai:weekly_hits');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.week === wk) return parsed;
+    }
+  } catch {}
+  // New week or no state
+  const counts = {};
+  WEEKLY_HITS.forEach(h => counts[h.id] = 0);
+  return { week: wk, counts };
+}
+
+function saveHitState(state) {
+  try { localStorage.setItem('trainai:weekly_hits', JSON.stringify(state)); } catch {}
+}
+
+let hitState = loadHitState();
+
+function initGrocery() {
+  // Refresh hit state in case week changed
+  hitState = loadHitState();
+  renderWeekLabel();
+  renderWeeklyHits();
+  renderGroceryList();
+}
+
+function renderWeekLabel() {
+  const wk = getWeekKey();
+  const d = new Date(wk + 'T12:00:00');
+  const label = 'WK OF ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase();
+  document.getElementById('weekLabel').textContent = label;
+}
+
+function renderWeeklyHits() {
+  const container = document.getElementById('weeklyHits');
+  container.innerHTML = WEEKLY_HITS.map(h => {
+    const count = hitState.counts[h.id] ?? 0;
+    const pct = Math.min(100, Math.round((count / h.target) * 100));
+    const met = count >= h.target;
+    return `<div class="hit-row">
+      <div class="hit-emoji">${h.emoji}</div>
+      <div class="hit-info">
+        <div class="hit-name">${h.name}</div>
+        <div class="hit-sub">${h.sub}</div>
+        <div class="hit-bar-wrap"><div class="hit-bar" style="width:${pct}%"></div></div>
+      </div>
+      <div class="hit-right">
+        <div>
+          <div class="hit-count ${met ? 'met' : ''}">${count}</div>
+          <div class="hit-tgt">/ ${h.target}</div>
+        </div>
+        <button class="hit-btn" onclick="bumpHit('${h.id}')">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function bumpHit(id) {
+  if (hitState.counts[id] === undefined) hitState.counts[id] = 0;
+  hitState.counts[id]++;
+  saveHitState(hitState);
+  renderWeeklyHits();
+}
+
+function resetWeeklyHits() {
+  if (!confirm('Reset all weekly counts to zero?')) return;
+  WEEKLY_HITS.forEach(h => hitState.counts[h.id] = 0);
+  saveHitState(hitState);
+  renderWeeklyHits();
+}
+
+function renderGroceryList() {
+  document.getElementById('groceryList').innerHTML = GROCERY_LIST.map(section => `
+    <div class="groc-section">
+      <div class="groc-section-hdr">${section.cat}</div>
+      ${section.items.map(item => `
+        <div class="groc-item ${item.tier === 2 ? 'groc-t2' : ''}">
+          <div class="groc-emoji">${item.emoji}</div>
+          <div class="groc-info">
+            <div class="groc-name">${item.name}${item.tier === 1 ? '' : ' <span style="font-size:9px;color:#333;">(Tier 2)</span>'}</div>
+            <div class="groc-note">${item.note}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function copyGroceryList() {
+  const lines = ['TRAINAI GROCERY — SMART NUDGES', ''];
+  GROCERY_LIST.forEach(section => {
+    lines.push(`— ${section.cat} —`);
+    section.items.forEach(item => {
+      lines.push(`${item.emoji} ${item.name}`);
+    });
+    lines.push('');
+  });
+  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const msg = document.getElementById('groceryCopyMsg');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 2500);
+  }).catch(() => alert('Copy failed — try long-pressing the list'));
 }
 
 // ── BOOT ───────────────────────────────────────────────────────────────────────
