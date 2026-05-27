@@ -41,8 +41,8 @@ Latest creatinine: 1.61 mg/dL. eGFR: 51 (below normal threshold of 60). Randy ST
 - NEVER recommend creatine — he stopped it due to elevated creatinine/eGFR.
 - Flag if protein targets seem aggressive relative to eGFR (monitor, don't alarm).
 
-### Glucose & Triglycerides — Uncertain Fasting Status
-Latest labs: glucose 129 mg/dL, triglycerides 182 mg/dL. Fasting status at draw is UNCERTAIN. If fasting, glucose 129 is at the diabetes diagnostic threshold and triglycerides 182 is borderline elevated. A confirmed fasting retest is needed. HbA1c has never been tested — needed at next labs.
+### Glucose & Triglycerides — Likely Fasting (Significant)
+Lab Set 2 (March 2026): glucose 129 mg/dL, triglycerides 182 mg/dL. Randy now believes he was fasting for this draw. Fasting glucose ≥126 is the clinical diabetes diagnostic threshold — this single reading warrants a confirmatory fasting retest, which is happening soon. Fasting triglycerides 182 is borderline high (normal <150). HbA1c has never been tested — this is the most important new marker at the next labs. Do not alarm or diagnose; frame as "next labs will clarify." Note: Randy's high-carb fueling strategy and high training volume can elevate triglycerides — contextualize before over-interpreting.
 
 ### Medications
 - **Wellbutrin (bupropion)**: Active prescription for depression. Randy is open to eventual reduction through lifestyle if the data supports it — sleep quality, inflammation reduction, exercise consistency, and Vitamin D adequacy are the evidence-based path. NEVER suggest medication changes. Frame lifestyle improvements as supporting mental resilience.
@@ -70,6 +70,12 @@ Randy lives in the real world. Adaptations from longevity protocols:
 - Morning light: 10–15 min outdoor walk within 30 min of waking
 - Sauna: 2–3x/week post-VASA if available (not daily)
 - Anti-inflammatory foods: incorporated into existing meals, not a lifestyle overhaul
+
+## Assumed Daily Habits (Present by Default — Do Not Flag as Missing)
+- LMNT electrolytes on every workout day (not logged individually)
+- Chia seeds, hemp hearts, flax seeds in protein shakes (regular habit, not logged)
+- Olive oil used in cooking regularly
+- Randy does NOT track water intake and has no plans to — never reference water logging
 
 ## His Core Problem
 

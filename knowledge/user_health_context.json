@@ -46,11 +46,14 @@
     "glucose_triglycerides_flag": {
       "glucose_value": 129,
       "triglycerides_value": 182,
-      "fasting_status": "UNCERTAIN — Randy believes he may have been fasting but is not sure.",
-      "interpretation": "If fasting: glucose 129 is at the diabetes diagnostic threshold (126+) and triglycerides 182 is borderline high (150+). If non-fasting: less concerning but still warrants a confirmed fasting retest. NEXT LABS: confirm fasting status and retest both markers.",
+      "lab_set": "Lab Set 2 (March 2026)",
+      "fasting_status": "LIKELY FASTING — Randy now recalls he was likely fasting for Lab Set 2. Lab Set 1 (Dec 2025) was confirmed NOT fasting.",
+      "interpretation": "Fasting glucose 129 mg/dL exceeds the diabetes diagnostic threshold of 126 mg/dL. A single reading is not a diagnosis, but this is clinically significant and requires a confirmatory fasting retest. Fasting triglycerides 182 mg/dL is borderline high (normal <150, borderline 150–199, high 200+). HbA1c has never been tested — this is the most important single addition to the next labs. Randy will be confirmed fasting for his upcoming third labs.",
       "coach_rules": [
-        "Flag glucose and triglycerides as unresolved — confirmed fasting retest needed.",
-        "Do not assume non-fasting. Treat as potentially significant until confirmed."
+        "Flag glucose as potentially at the pre-diabetes/diabetes threshold — next labs will be the first fasting-confirmed retest.",
+        "Do not alarm or diagnose. Frame as: this warrants a confirmed retest, which is happening soon.",
+        "HbA1c is the priority new marker — it gives 90-day glucose average, unaffected by fasting status.",
+        "Triglycerides respond strongly to dietary carbohydrate intake and training load — contextualize against Randy's high-carb fueling strategy before over-interpreting."
       ]
     }
   },
@@ -63,12 +66,13 @@
       "tracking": "Yes/No taken daily"
     },
     "eszopiclone_lunesta": {
-      "status": "Active, being reduced",
-      "standard_dose_mg": 2,
-      "optional_extra_mg": 1,
-      "pattern": "2mg most nights at bedtime. Sometimes takes additional 1mg if waking at night (e.g., 4 AM). Goal is to reduce use over time.",
-      "coach_context": "Eszopiclone reduces sleep latency but may reduce deep and REM sleep quality at higher doses. Reduction goal aligns with improving natural sleep quality through other interventions.",
-      "tracking": "Dose taken (mg) + time + whether extra dose was needed"
+      "status": "Active, being reduced over time",
+      "bedtime_dose_mg": 2,
+      "optional_extra_dose_mg": 1,
+      "max_total_mg": 3,
+      "pattern": "2mg at bedtime most nights. Sometimes an additional 1mg if waking during the night (e.g., 4 AM). Maximum total = 3mg. Goal is to reduce reliance as natural sleep quality improves.",
+      "coach_context": "Eszopiclone (Lunesta) is a sedative-hypnotic. The extra 1mg is reactive to night waking — not a fixed dose. As sleep quality improves through magnesium, consistent bedtime, reduced LDN disruption, and lower inflammation, the need for the extra dose should decrease. Acknowledge nights where the extra dose was not needed as a positive trend.",
+      "tracking": "Bedtime dose (mg) + whether extra dose was taken during night + time of extra dose"
     },
     "ldn_low_dose_naltrexone": {
       "status": "Active — started approx April 2026",
@@ -181,6 +185,20 @@
     "Vitamin D — confirm sustained improvement",
     "TgAb — second thyroid autoimmune marker not yet tested"
   ],
+
+  "assumed_daily_habits": {
+    "note": "These are consistent behaviors Randy does reliably but does not log. The coach should treat them as present unless there is reason to think otherwise. Do not flag these as missing data.",
+    "habits": [
+      "LMNT electrolytes — always taken on workout/gym days. Not tracked per-day.",
+      "Chia seeds + hemp hearts + flax seeds — added to protein shakes. Regular habit, not logged.",
+      "Olive oil — used regularly in cooking. Not tracked per meal.",
+      "Protein shakes — regular part of diet, not always logged individually."
+    ],
+    "no_tracking": [
+      "Water intake — Randy does not track water and has no plans to. Do not ask about or reference water logging.",
+      "Every micro-ingredient in shakes and meals — some nutritional context will always be invisible. The macro totals from MacrosFirst are the best available signal."
+    ]
+  },
 
   "protocol_realism": {
     "context": "Randy works in an office, has a family with kids, and cannot follow extreme protocols. The Bryan Johnson framework is a source of evidence-based principles, not a prescription to follow exactly.",
