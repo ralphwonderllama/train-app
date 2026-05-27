@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "version": "1.0",
+    "last_updated": "2026-05-27",
+    "purpose": "Prioritized queue of health books to process via Gemini extraction into TrainAI knowledge base. Use the extraction prompt in GEMINI_EXTRACTION_PROMPT.md with Google AI Studio.",
+    "workflow": "1) Open Google AI Studio, 2) Paste extraction prompt as System Instructions, 3) Upload ebook PDF or paste chapter text, 4) Save JSON output as knowledge/{slug}.json, 5) Add require() to api/coach.js and wire into system prompt"
+  },
+
+  "queue": [
+
+    {
+      "priority": 1,
+      "slug": "outlive_attia",
+      "title": "Outlive: The Science and Art of Longevity",
+      "author": "Dr. Peter Attia",
+      "status": "queued",
+      "randy_relevance": "HIGH — Attia's framework is directly structured around Randy's goals. VO2 max, grip strength, and eccentric strength are the three highest predictors of longevity and physical independence. His 'Centenarian Decathlon' concept: what do you need to physically do at 80? Work backward and train for it NOW. Randy's 50-mile mountain hiking trek is a concrete version of this.",
+      "key_topics_to_extract": [
+        "Zone 2 cardio — definition, target heart rate, why it's the highest-ROI longevity lever. Randy's cycling and hiking qualify.",
+        "VO2 max — how to measure, target ranges by age, how to improve. Key longevity predictor.",
+        "Eccentric strength training — why the lowering phase matters, Nordic hamstring curls, single-leg lowering, relevance to hiking descents.",
+        "Grip strength — testing protocol, age-adjusted norms, tracking as longevity proxy.",
+        "Centenarian Decathlon framework — working backward from physical capacity targets at 80.",
+        "ApoB and cardiovascular metabolic risk (relevant to Randy's triglycerides and glucose flags).",
+        "Insulin resistance — Attia's detailed framework, very relevant to glucose 129 flag.",
+        "Sleep architecture and deep sleep — Attia's view on sleep as the master recovery lever.",
+        "Zone 5 / high-intensity intervals — when to use, how to combine with Zone 2."
+      ],
+      "randy_caveats": [
+        "Randy's goal is to GAIN weight (147→160 lb), not lose it — filter fat-loss framing accordingly.",
+        "Kidney function (eGFR 51) means some aggressive protein targets may need contextualization.",
+        "Attia sometimes recommends creatine — Randy has stopped this due to elevated creatinine. Flag."
+      ],
+      "coach_integration_target": "Physical performance section: validate Zone 2 sessions, track VO2 max proxy via Oura trends, coach on eccentric strength programming"
+    },
+
+    {
+      "priority": 2,
+      "slug": "brain_energy_palmer",
+      "title": "Brain Energy: A Revolutionary Breakthrough in Understanding Mental Health",
+      "author": "Dr. Christopher Palmer",
+      "status": "queued",
+      "randy_relevance": "HIGH — Palmer's thesis reframes mental health disorders (including depression) as mitochondrial energy disorders, not purely neurotransmitter imbalances. Directly relevant to the Wellbutrin context. Every lifestyle intervention Randy is doing (exercise, anti-inflammatory diet, sleep, gut health) is mitochondrial medicine. This is the mechanistic bridge between Randy's protocol and potential Wellbutrin reduction — but the framing must remain 'parallel support pathway' not 'replace medication.'",
+      "key_topics_to_extract": [
+        "Mitochondrial dysfunction as root cause of depression and anxiety — mechanism chain.",
+        "How exercise specifically improves mitochondrial density and function — anti-depressant mechanism.",
+        "Metabolic psychiatry framework — dietary interventions for brain energy.",
+        "Ketogenic diet evidence for mental health (note: not fully compatible with Randy's high-carb performance fueling — extract mechanism, filter application).",
+        "Sleep and mitochondrial repair — why deep sleep is when mitochondria regenerate.",
+        "Inflammation → mitochondrial dysfunction → depression: the mechanism connecting gut health, autoimmunity, and mood.",
+        "Specific nutrients for mitochondrial function: CoQ10, B vitamins, magnesium, omega-3 (Randy already has fish oil)."
+      ],
+      "randy_caveats": [
+        "Palmer sometimes recommends ketogenic diet — not compatible with Randy's high-carb endurance fueling protocol. Extract mechanisms, not diet prescriptions.",
+        "NEVER use this book to suggest medication changes. Frame entirely as 'supporting the same targets through parallel pathways.'"
+      ],
+      "coach_integration_target": "Sleep section: connect deep sleep to mitochondrial repair and mood. Supplement section: validate magnesium, omega-3 as mitochondrial support."
+    },
+
+    {
+      "priority": 3,
+      "slug": "nature_wants_fat_johnson",
+      "title": "Nature Wants Us to Be Fat",
+      "author": "Dr. Richard Johnson (nephrologist)",
+      "status": "queued",
+      "randy_relevance": "MEDIUM-HIGH — The 'fat' framing does NOT apply (Randy needs to gain weight, not lose it). However, Johnson is a nephrologist whose research is highly relevant to: (1) eGFR 51 / kidney inflammation, (2) fructose-uric acid pathway driving triglycerides and metabolic dysfunction, (3) the 'survival switch' mechanism causing mitochondrial downregulation and organ inflammation. Extract mechanisms, not the fat-loss prescriptions.",
+      "key_topics_to_extract": [
+        "Fructose-uric acid 'survival switch' mechanism — how fructose triggers cellular energy downregulation.",
+        "Uric acid as inflammatory mediator — connection to kidney function, triglycerides, and metabolic dysfunction.",
+        "Kidney inflammation from metabolic dysfunction — very relevant to eGFR 51.",
+        "Mitochondrial dysfunction from sugar/fructose load — mechanism chain.",
+        "Dietary interventions for lowering uric acid and protecting kidney function.",
+        "Why high-fructose corn syrup and added sugars are different from whole-food carbohydrates (important for Randy's high-carb fueling strategy)."
+      ],
+      "randy_caveats": [
+        "Randy needs to GAIN weight — ignore all fat-loss prescriptions and caloric restriction advice.",
+        "Extract the organ-protection and metabolic mechanisms — not the weight loss framework.",
+        "Kidney function rules still apply: no creatine, monitor protein targets."
+      ],
+      "coach_integration_target": "Coach medical flags: glucose/triglyceride interpretation, kidney function context, uric acid awareness"
+    },
+
+    {
+      "priority": 4,
+      "slug": "built_to_move_starrett",
+      "title": "Built to Move: The Ten Essential Habits to Help You Move Freely and Live Fully",
+      "author": "Dr. Kelly Starrett and Juliet Starrett",
+      "status": "queued",
+      "randy_relevance": "HIGH for physical baseline testing — the 10 empirical physical tests function as a 'physical age' report card. The sit-and-rise test, balance tests, shoulder mobility, hip mobility are all trackable baselines. Given Randy's 50-mile hiking trek goal, the Starretts' connective tissue and joint health framework is directly applicable. He already uses Athlean-X and Moves Method for programming — this adds the assessment layer.",
+      "key_topics_to_extract": [
+        "All 10 physical tests: exact protocols, scoring, and what each predicts.",
+        "Sit-and-rise test — scoring methodology, longevity correlation data.",
+        "Breathing mechanics — connection to HRV and nervous system recovery (syncs with Oura data).",
+        "Hip mobility protocols — directly relevant to hiking and squat mechanics.",
+        "Shoulder mobility and overhead position — important for Randy's lifting.",
+        "Connective tissue health — nutrition and recovery for tendons and ligaments.",
+        "Sleep position and recovery recommendations.",
+        "Walking targets and gait mechanics — relevant to hiking training."
+      ],
+      "randy_caveats": [
+        "Randy has strong athletic baseline — test results context matters. A score that looks 'below average' for a sedentary person may be different for a hybrid athlete.",
+        "Some tests may need modification given current weight-gain phase."
+      ],
+      "coach_integration_target": "Log screen: physical baseline test tracker (quarterly check-ins). Fitness coaching: reference specific Starrett tests in mobility recommendations."
+    },
+
+    {
+      "priority": 5,
+      "slug": "pegan_diet_hyman",
+      "title": "The Pegan Diet",
+      "author": "Dr. Mark Hyman",
+      "status": "queued",
+      "randy_relevance": "HIGH — Hyman's Pegan framework (plant-rich + quality protein + anti-inflammatory fats) aligns closely with Randy's current eating patterns and health goals. Strong on autoimmune, inflammation, and metabolic health. Good bibliography for finding primary studies.",
+      "key_topics_to_extract": [
+        "Autoimmune disease dietary interventions — TPOAb-relevant.",
+        "High-quality fat sources and anti-inflammatory nutrition.",
+        "Gluten and leaky gut mechanism (reinforces existing protocol).",
+        "Blood sugar regulation through food — relevant to glucose 129 flag.",
+        "Plant diversity framework.",
+        "Specific foods for hormone and thyroid support."
+      ],
+      "randy_caveats": [
+        "Randy needs to GAIN weight — some of Hyman's caloric density guidance may need inversion.",
+        "GF already established — no need to re-extract that foundation."
+      ],
+      "coach_integration_target": "Nutrition coaching: food quality recommendations, anti-inflammatory meal building"
+    },
+
+    {
+      "priority": 6,
+      "slug": "fiber_fueled_bulsiewicz",
+      "title": "Fiber Fueled",
+      "author": "Dr. Will Bulsiewicz",
+      "status": "queued",
+      "randy_relevance": "HIGH — Gut-Hashimoto's axis, SCFA/butyrate mechanism, 30-plants-per-week target. Core to TPOAb reduction strategy. Already partially integrated in anti_inflammatory_protocols.json.",
+      "key_topics_to_extract": [
+        "30 plants per week framework — evidence base, how to count, practical implementation.",
+        "SCFA production and gut barrier integrity — full mechanism.",
+        "Specific prebiotic fibers and their microbial targets.",
+        "Fermented foods research (complements Stanford 2021 data already in knowledge base).",
+        "Autoimmune connections — any specific Hashimoto's or thyroid references.",
+        "High-fiber eating for athletic performance — any performance nutrition angle."
+      ],
+      "randy_caveats": [
+        "Randy needs caloric density — high-fiber foods can be filling; frame as additions, not replacements."
+      ],
+      "coach_integration_target": "Nutrition section: fiber diversity tracking, gut health recommendations"
+    },
+
+    {
+      "priority": 7,
+      "slug": "mind_gut_connection_mayer",
+      "title": "The Mind-Gut Connection",
+      "author": "Dr. Emeran Mayer",
+      "status": "queued",
+      "randy_relevance": "MEDIUM-HIGH — Gut-brain axis, 90% serotonin in gut, enteric nervous system. Reinforces the Wellbutrin parallel pathway argument. Scientifically rigorous — Mayer runs a gut-brain research lab at UCLA.",
+      "key_topics_to_extract": [
+        "Vagus nerve and bidirectional gut-brain communication.",
+        "Gut microbiome → neurotransmitter production → mood.",
+        "Specific probiotic strains with mood evidence.",
+        "Stress → gut permeability → systemic inflammation pathway.",
+        "How exercise affects the gut-brain axis.",
+        "Any specific dietary interventions for depression via gut."
+      ],
+      "coach_integration_target": "Sleep/mood section: gut-brain axis framing, serotonin production context"
+    },
+
+    {
+      "priority": 8,
+      "slug": "whole_body_prostate_katz",
+      "title": "The Whole-Body Approach to Prostate Care",
+      "author": "Dr. Aaron Katz",
+      "status": "queued",
+      "randy_relevance": "MEDIUM — Prostate health through anti-inflammatory and lifestyle lens. Relevant given age 51, insulin resistance flag (glucose 129), and that PSA testing should likely start if not already done. Katz's framework overlaps heavily with anti-inflammatory work already in progress.",
+      "key_topics_to_extract": [
+        "Insulin resistance → BPH (benign prostatic hyperplasia) mechanism.",
+        "Specific foods and supplements for prostate protection.",
+        "PSA monitoring recommendations.",
+        "Anti-inflammatory interventions for prostate health.",
+        "Hormonal balance and prostate — relevant given testosterone 531 ng/dL."
+      ],
+      "randy_caveats": [
+        "De-prioritize — significant overlap with existing anti-inflammatory protocol.",
+        "Most valuable addition would be any prostate-specific lab markers to add to next labs list."
+      ],
+      "coach_integration_target": "Medical context: prostate health monitoring, PSA testing recommendation"
+    }
+
+  ],
+
+  "processing_notes": {
+    "gemini_model": "Gemini 1.5 Pro or 2.0 Flash — both handle full book PDFs in one context window",
+    "prompt_location": "Use the extraction prompt provided in your Claude session history",
+    "output_naming": "knowledge/{slug}.json (e.g., knowledge/outlive_attia.json)",
+    "integration_steps": [
+      "1. Save Gemini output as knowledge/{slug}.json",
+      "2. Add const bookVar = require('../knowledge/{slug}.json'); to api/coach.js",
+      "3. Wire key insights into SYSTEM_PROMPT — brief, targeted section not full re-dump of JSON",
+      "4. Update book_queue.json status from 'queued' to 'integrated'"
+    ],
+    "priority_order_reasoning": "Outlive (Attia) first because it covers VO2 max/Zone 2 which directly affects daily coaching output. Brain Energy (Palmer) second because Wellbutrin context needs the mitochondrial framing. Johnson third for kidney/metabolic mechanisms. Starretts fourth for physical baseline tests."
+  }
+}
