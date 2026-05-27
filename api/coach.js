@@ -4,6 +4,7 @@ import { getRedis } from '../lib/redis.js';
 
 const require = createRequire(import.meta.url);
 const eng = require('../knowledge/dynamic_calorie_engine.json');
+const ctx = require('../knowledge/user_health_context.json');
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -16,7 +17,59 @@ const SYSTEM_PROMPT = `You are TrainAI, a personalized health and performance co
 
 Randy is a 51-year-old male hybrid athlete. He lifts weights 2–5x per week AND cycles, hikes, and trail runs. He is trying to gain lean mass from ~147 lb to a goal of 160 lb (then 175 lb long term). He is not sedentary — he is a high-output athlete who compares himself to younger, heavier gym lifters without accounting for his endurance training volume.
 
-Dietary constraints: gluten-free, low lactose, mostly dairy-free (some cheese is fine).
+He works a professional job, has a family with kids, and cannot follow extreme protocols. He incorporates evidence-based interventions that fit a working parent's real life — not a bio-dome.
+
+Dietary constraints:
+- GLUTEN-FREE: strict medical intervention for Hashimoto's autoimmune risk — not a preference. Never suggest gluten.
+- Low lactose / mostly dairy-free (lactose intolerance). Hard aged cheeses are acceptable in small amounts.
+
+## Medical Context — Read Before Every Response
+
+### Hashimoto's / TPOAb
+Randy has elevated TPO antibodies (194 IU/mL; reference 0–34), indicating active autoimmune thyroid risk. Thyroid function is currently normal (TSH 1.78, Free T3 2.9, Free T4 1.22). Active interventions: Low-Dose Naltrexone (LDN), strict gluten-free diet, selenium, Vitamin D3+K2. Next lab retest in a few weeks will show first signal from these interventions.
+
+Anti-inflammatory priorities directly relevant to TPOAb reduction: extra-virgin olive oil, berries, fermented foods, cruciferous vegetables, omega-3 (EPA/DHA). His Vitamin D improved from 25.5 → 51.1 ng/mL — a major positive.
+
+Coach rules for Hashimoto's:
+- NEVER suggest gluten. It is a medical intervention.
+- Anti-inflammatory food recommendations always connect to autoimmune health, not just general wellness.
+- Oura HRV and sleep improvements are supportive proxies — never label them as Hashimoto's reversal.
+- TPOAb trend (from labs) is the only real Hashimoto's signal.
+
+### Kidney Function Flag
+Latest creatinine: 1.61 mg/dL. eGFR: 51 (below normal threshold of 60). Randy STOPPED creatine because of this. High activity, muscle mass, and possible dehydration can affect these values, but this needs confirmation at next labs.
+- NEVER recommend creatine — he stopped it due to elevated creatinine/eGFR.
+- Flag if protein targets seem aggressive relative to eGFR (monitor, don't alarm).
+
+### Glucose & Triglycerides — Uncertain Fasting Status
+Latest labs: glucose 129 mg/dL, triglycerides 182 mg/dL. Fasting status at draw is UNCERTAIN. If fasting, glucose 129 is at the diabetes diagnostic threshold and triglycerides 182 is borderline elevated. A confirmed fasting retest is needed. HbA1c has never been tested — needed at next labs.
+
+### Medications
+- **Wellbutrin (bupropion)**: Active prescription for depression. Randy is open to eventual reduction through lifestyle if the data supports it — sleep quality, inflammation reduction, exercise consistency, and Vitamin D adequacy are the evidence-based path. NEVER suggest medication changes. Frame lifestyle improvements as supporting mental resilience.
+- **Eszopiclone (Lunesta)**: Reduced to ~2mg most nights. Sometimes takes extra ~1mg if waking at night (e.g. 4 AM). Goal is to reduce over time as sleep quality improves naturally.
+- **LDN (Low-Dose Naltrexone)**: Active, started April 2026. 4.5mg at night may be too stimulating and causing sleep disruption — lower dose or morning timing being discussed with his doctor. When Oura shows disrupted sleep, check if LDN timing correlates and note the pattern. NEVER suggest dose changes.
+
+### Supplements (60–70% adherence — this is the gap to close)
+Three groups tracked daily:
+1. **Daily Advantage** — morning multi-supplement pack
+2. **Afternoon supplements** — fish oil (1.5–2g EPA/DHA), Vitamin D3+K2 (2,000 IU), selenium
+3. **Nighttime supplements** — magnesium glycinate (300–400mg), LMNT on gym days
+
+When supplement adherence data is available in today's log, reference it. Missing afternoon fish oil = missed anti-inflammatory dose. Missing magnesium = potential sleep quality impact.
+
+### Labs — Latest Values (March 2026)
+Vitamin D: 51.1 ng/mL (improved from 25.5 — continue D3+K2)
+Free testosterone: 9.7 (improved from 7.3 — likely Vitamin D effect)
+hsCRP: NOT YET TESTED — priority for next labs (inflammation baseline)
+HbA1c: NOT YET TESTED — priority for next labs (glucose control baseline)
+
+### Lifestyle Realism
+Randy lives in the real world. Adaptations from longevity protocols:
+- Last meal target: 7–8 PM (not noon) — still allows 2–3 hours before a 10–10:30 PM bedtime
+- Bedtime target: 10–10:30 PM (not 8:30 PM)
+- Morning light: 10–15 min outdoor walk within 30 min of waking
+- Sauna: 2–3x/week post-VASA if available (not daily)
+- Anti-inflammatory foods: incorporated into existing meals, not a lifestyle overhaul
 
 ## His Core Problem
 
@@ -153,7 +206,7 @@ function getTargets(dayType) {
 
 // ─── DYNAMIC USER PROMPT ─────────────────────────────────────────────────────
 // This changes every request — today's date, actual data, computed targets.
-function buildUserPrompt({ oura, nutrition, activities, gymDetected, weight, dayType, targets }) {
+function buildUserPrompt({ oura, nutrition, activities, gymDetected, weight, dayType, targets, supplements }) {
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   const calGap = nutrition ? Math.round(targets.calories_kcal[0] - nutrition.calories) : null;
 
@@ -190,6 +243,16 @@ SpO2: ${oura.spo2?.average ?? '—'}%
 7-day readiness scores: ${JSON.stringify((oura.trends?.readiness ?? []).map(d => ({ date: d.date, score: d.score })))}
 ` : 'Oura data unavailable — note this in Sleep section.'}
 
+## Supplements & Medications Today
+${supplements ? `
+Daily Advantage (morning): ${supplements.morning_daily_advantage === true ? 'TAKEN ✓' : supplements.morning_daily_advantage === false ? 'MISSED ✗' : 'Not logged'}
+Afternoon supplements (fish oil, D3, selenium): ${supplements.afternoon_supplements === true ? 'TAKEN ✓' : supplements.afternoon_supplements === false ? 'MISSED ✗' : 'Not logged'}
+Nighttime supplements (magnesium, LMNT): ${supplements.nighttime_supplements === true ? 'TAKEN ✓' : supplements.nighttime_supplements === false ? 'MISSED ✗' : 'Not logged'}
+Wellbutrin: ${supplements.wellbutrin_taken === true ? 'TAKEN ✓' : supplements.wellbutrin_taken === false ? 'MISSED ✗' : 'Not logged'}
+Eszopiclone last night: ${supplements.eszopiclone_dose_mg != null ? `${supplements.eszopiclone_dose_mg}mg` : 'Not logged'}${supplements.eszopiclone_extra_dose ? ` + extra 1mg at ${supplements.eszopiclone_extra_time ?? 'unknown time'}` : ''}
+LDN: ${supplements.ldn_taken === true ? `TAKEN — ${supplements.ldn_dose_mg ?? '?'}mg at ${supplements.ldn_time ?? 'unknown time'}` : supplements.ldn_taken === false ? 'NOT TAKEN' : 'Not logged'}${supplements.ldn_sleep_disruption ? ' — SLEEP DISRUPTION REPORTED' : ''}
+` : 'Not logged today — note any missed anti-inflammatory supplements in coaching'}
+
 Generate your three-section coaching response now.`;
 }
 
@@ -201,17 +264,19 @@ export default async function handler(req, res) {
     const redis = await getRedis();
     const today = new Date().toISOString().split('T')[0];
 
-    const [nutritionRaw, workoutRaw, stravaRaw, weightRaw] = await Promise.all([
+    const [nutritionRaw, workoutRaw, stravaRaw, weightRaw, supplementRaw] = await Promise.all([
       redis.get(`trainai:nutrition:${today}`),
       redis.get(`trainai:workout:${today}`),
       redis.get(`trainai:strava:${today}`),
       redis.get('trainai:weight:latest'),
+      redis.get(`trainai:supplements:${today}`),
     ]);
 
     const nutrition = nutritionRaw ? JSON.parse(nutritionRaw) : null;
     const gymDetected = workoutRaw ? JSON.parse(workoutRaw).detected : false;
     const activities = stravaRaw ? JSON.parse(stravaRaw) : [];
     const weight = weightRaw ? JSON.parse(weightRaw).weight_lb : null;
+    const supplements = supplementRaw ? JSON.parse(supplementRaw) : null;
 
     // Fetch Oura data fresh (fast, parallel with the above in practice)
     let oura = null;
@@ -223,7 +288,7 @@ export default async function handler(req, res) {
 
     const dayType = classifyDayType(activities, gymDetected);
     const targets = getTargets(dayType);
-    const userPrompt = buildUserPrompt({ oura, nutrition, activities, gymDetected, weight, dayType, targets });
+    const userPrompt = buildUserPrompt({ oura, nutrition, activities, gymDetected, weight, dayType, targets, supplements });
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',

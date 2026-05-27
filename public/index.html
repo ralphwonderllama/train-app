@@ -388,6 +388,34 @@
     .alert-green  { background: rgba(0,209,102,.08);  border: 1px solid rgba(0,209,102,.25);  color: var(--green); }
 
     hr.divider { border: none; border-top: 1px solid #111; margin: .875rem 0; }
+
+    /* ── SUPPLEMENT CHECKLIST ───────────────────────────── */
+    .supp-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: .5rem 0;
+      cursor: pointer;
+      border-bottom: 1px solid #0d0d0d;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .supp-row:last-of-type { border-bottom: none; }
+    .supp-row:active { opacity: .6; }
+    .supp-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #222;
+      border: 1px solid #333;
+    }
+    .supp-dot.taken  { background: var(--green); box-shadow: 0 0 8px rgba(0,209,102,.6); border-color: var(--green); }
+    .supp-dot.missed { background: var(--red);   box-shadow: 0 0 8px rgba(237,28,36,.4); border-color: var(--red); }
+    .supp-info { flex: 1; }
+    .supp-name { font-size: 13px; font-weight: 600; color: #fff; }
+    .supp-sub  { font-size: 10px; color: #444; margin-top: 1px; }
+    .supp-status { font-size: 11px; font-weight: 700; color: #333; white-space: nowrap; }
+    .supp-status.taken  { color: var(--green); }
+    .supp-status.missed { color: var(--red); }
   </style>
 </head>
 <body>
@@ -599,6 +627,106 @@
       <div class="card">
         <div class="card-title">RECENT WEIGH-INS</div>
         <div id="wHistory"><div class="loading"><div class="dot dot-dim pulse"></div>LOADING…</div></div>
+      </div>
+
+      <!-- Supplement & Medication Checklist -->
+      <div class="card">
+        <div class="card-title">SUPPLEMENTS &amp; MEDS TODAY</div>
+        <div style="font-size:10px;color:#444;margin-bottom:.875rem;">Tap each row to mark taken / missed</div>
+
+        <!-- Supplement groups -->
+        <div id="suppChecklist">
+          <div class="supp-row" id="sr-morning"     onclick="toggleSupp('morning_daily_advantage','sr-morning')">
+            <div class="supp-dot" id="sd-morning"></div>
+            <div class="supp-info">
+              <div class="supp-name">Daily Advantage</div>
+              <div class="supp-sub">Morning pack</div>
+            </div>
+            <div class="supp-status" id="ss-morning">—</div>
+          </div>
+          <div class="supp-row" id="sr-afternoon"   onclick="toggleSupp('afternoon_supplements','sr-afternoon')">
+            <div class="supp-dot" id="sd-afternoon"></div>
+            <div class="supp-info">
+              <div class="supp-name">Afternoon Supplements</div>
+              <div class="supp-sub">Fish oil · D3+K2 · Selenium</div>
+            </div>
+            <div class="supp-status" id="ss-afternoon">—</div>
+          </div>
+          <div class="supp-row" id="sr-nighttime"   onclick="toggleSupp('nighttime_supplements','sr-nighttime')">
+            <div class="supp-dot" id="sd-nighttime"></div>
+            <div class="supp-info">
+              <div class="supp-name">Nighttime Supplements</div>
+              <div class="supp-sub">Magnesium glycinate · LMNT (gym days)</div>
+            </div>
+            <div class="supp-status" id="ss-nighttime">—</div>
+          </div>
+
+          <hr class="divider" style="margin:.5rem 0;">
+
+          <!-- Medications -->
+          <div class="supp-row" id="sr-wellbutrin"  onclick="toggleSupp('wellbutrin_taken','sr-wellbutrin')">
+            <div class="supp-dot" id="sd-wellbutrin"></div>
+            <div class="supp-info">
+              <div class="supp-name">Wellbutrin</div>
+              <div class="supp-sub">Bupropion — daily Rx</div>
+            </div>
+            <div class="supp-status" id="ss-wellbutrin">—</div>
+          </div>
+          <div class="supp-row" id="sr-ldn"          onclick="toggleSupp('ldn_taken','sr-ldn')">
+            <div class="supp-dot" id="sd-ldn"></div>
+            <div class="supp-info">
+              <div class="supp-name">LDN</div>
+              <div class="supp-sub">Low-dose naltrexone</div>
+            </div>
+            <div class="supp-status" id="ss-ldn">—</div>
+          </div>
+        </div>
+
+        <!-- LDN detail (shown when LDN is marked taken) -->
+        <div id="ldnDetail" style="display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid #111;">
+          <div class="row-2" style="margin-bottom:.5rem;">
+            <div class="field" style="margin:0;">
+              <label>LDN Dose (mg)</label>
+              <input type="number" id="ldnDose" placeholder="1.5" step="0.5" onchange="saveLdnDetail()">
+            </div>
+            <div class="field" style="margin:0;">
+              <label>Time taken</label>
+              <input type="text" id="ldnTime" placeholder="Morning / 7:00 AM" onchange="saveLdnDetail()">
+            </div>
+          </div>
+          <div class="supp-row" style="cursor:pointer;" id="sr-ldnDisrupt" onclick="toggleLdnDisrupt()">
+            <div class="supp-dot dot-dim" id="sd-ldnDisrupt"></div>
+            <div class="supp-info"><div class="supp-name" style="font-size:11px;">Sleep disrupted last night?</div></div>
+            <div class="supp-status" id="ss-ldnDisrupt">—</div>
+          </div>
+        </div>
+
+        <!-- Eszopiclone section -->
+        <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid #111;">
+          <div style="font-size:10px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;">Eszopiclone Last Night</div>
+          <div class="row-2">
+            <div class="field" style="margin:0;">
+              <label>Dose (mg)</label>
+              <input type="number" id="eszDose" placeholder="2" step="1" max="3" onchange="saveEsz()">
+            </div>
+            <div class="field" style="margin:0;">
+              <label>Extra dose at night?</label>
+              <select id="eszExtra" onchange="saveEsz()" style="width:100%;background:#0d0d0d;border:1px solid #222;border-radius:2px;color:#fff;padding:9px 11px;font-family:'Nunito Sans',sans-serif;font-size:14px;outline:none;">
+                <option value="">—</option>
+                <option value="no">No</option>
+                <option value="yes">Yes (+1mg)</option>
+              </select>
+            </div>
+          </div>
+          <div id="eszTimeRow" style="display:none;margin-top:.5rem;">
+            <div class="field" style="margin:0;">
+              <label>Time of extra dose</label>
+              <input type="text" id="eszTime" placeholder="4:00 AM" onchange="saveEsz()">
+            </div>
+          </div>
+        </div>
+
+        <div id="suppSaveMsg" style="font-size:11px;color:var(--green);margin-top:.625rem;display:none;"></div>
       </div>
 
       <!-- Manual gym check-in -->
@@ -1055,6 +1183,7 @@ function renderSleep(oura) {
 // LOG
 // ════════════════════════════════════════════════════════════════════════════════
 async function initLog() {
+  loadSupplements();
   // Weight
   try {
     const r=await fetch('/api/weight');
@@ -1152,6 +1281,132 @@ async function importCSV() {
   } catch {
     msg.style.color='var(--red)'; msg.textContent='Import failed — check CSV format';
   }
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SUPPLEMENTS / MEDICATIONS
+// ════════════════════════════════════════════════════════════════════════════════
+
+// Map field name → row/dot/status element IDs
+const SUPP_MAP = {
+  morning_daily_advantage: { row:'sr-morning',   dot:'sd-morning',   status:'ss-morning'   },
+  afternoon_supplements:   { row:'sr-afternoon', dot:'sd-afternoon', status:'ss-afternoon' },
+  nighttime_supplements:   { row:'sr-nighttime', dot:'sd-nighttime', status:'ss-nighttime' },
+  wellbutrin_taken:        { row:'sr-wellbutrin',dot:'sd-wellbutrin',status:'ss-wellbutrin'},
+  ldn_taken:               { row:'sr-ldn',       dot:'sd-ldn',       status:'ss-ldn'       },
+};
+
+// Local state for today's supplement entry
+let suppState = {};
+
+async function loadSupplements() {
+  try {
+    const r = await fetch('/api/supplements');
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    if (d.entry) {
+      suppState = d.entry;
+      renderSuppChecklist();
+    }
+  } catch { /* non-fatal */ }
+}
+
+function renderSuppChecklist() {
+  for (const [field, els] of Object.entries(SUPP_MAP)) {
+    setSuppUI(field, suppState[field]);
+  }
+  // Eszopiclone
+  if (suppState.eszopiclone_dose_mg != null)
+    document.getElementById('eszDose').value = suppState.eszopiclone_dose_mg;
+  if (suppState.eszopiclone_extra_dose != null)
+    document.getElementById('eszExtra').value = suppState.eszopiclone_extra_dose ? 'yes' : 'no';
+  if (suppState.eszopiclone_extra_time)
+    document.getElementById('eszTime').value = suppState.eszopiclone_extra_time;
+  // LDN detail
+  if (suppState.ldn_taken) {
+    document.getElementById('ldnDetail').style.display = 'block';
+    if (suppState.ldn_dose_mg)  document.getElementById('ldnDose').value = suppState.ldn_dose_mg;
+    if (suppState.ldn_time)     document.getElementById('ldnTime').value = suppState.ldn_time;
+    setSuppDotManual('sd-ldnDisrupt', 'ss-ldnDisrupt', suppState.ldn_sleep_disruption);
+  }
+}
+
+function setSuppUI(field, val) {
+  const els = SUPP_MAP[field];
+  if (!els) return;
+  setSuppDotManual(els.dot, els.status, val);
+}
+
+function setSuppDotManual(dotId, statusId, val) {
+  const dot = document.getElementById(dotId);
+  const status = document.getElementById(statusId);
+  if (!dot || !status) return;
+  dot.className = 'supp-dot';
+  status.className = 'supp-status';
+  if (val === true)  { dot.classList.add('taken');  status.classList.add('taken');  status.textContent = 'TAKEN'; }
+  else if (val === false) { dot.classList.add('missed'); status.classList.add('missed'); status.textContent = 'MISSED'; }
+  else { status.textContent = '—'; }
+}
+
+// Cycle: null → true (taken) → false (missed) → null
+function nextSuppState(current) {
+  if (current === null || current === undefined) return true;
+  if (current === true)  return false;
+  return null;
+}
+
+async function toggleSupp(field, rowId) {
+  const next = nextSuppState(suppState[field]);
+  suppState[field] = next;
+  setSuppUI(field, next);
+
+  // Show/hide LDN detail
+  if (field === 'ldn_taken')
+    document.getElementById('ldnDetail').style.display = next === true ? 'block' : 'none';
+
+  await saveSuppField({ [field]: next });
+}
+
+async function toggleLdnDisrupt() {
+  const next = nextSuppState(suppState.ldn_sleep_disruption);
+  suppState.ldn_sleep_disruption = next;
+  setSuppDotManual('sd-ldnDisrupt', 'ss-ldnDisrupt', next);
+  await saveSuppField({ ldn_sleep_disruption: next });
+}
+
+async function saveLdnDetail() {
+  const dose = parseFloat(document.getElementById('ldnDose').value) || null;
+  const time = document.getElementById('ldnTime').value || null;
+  suppState.ldn_dose_mg = dose;
+  suppState.ldn_time    = time;
+  await saveSuppField({ ldn_dose_mg: dose, ldn_time: time });
+}
+
+async function saveEsz() {
+  const dose  = parseFloat(document.getElementById('eszDose').value) || null;
+  const extra = document.getElementById('eszExtra').value;
+  const extraBool = extra === 'yes' ? true : extra === 'no' ? false : null;
+  const time  = document.getElementById('eszTime').value || null;
+
+  document.getElementById('eszTimeRow').style.display = extra === 'yes' ? 'block' : 'none';
+
+  suppState.eszopiclone_dose_mg    = dose;
+  suppState.eszopiclone_extra_dose = extraBool;
+  suppState.eszopiclone_extra_time = time;
+  await saveSuppField({ eszopiclone_dose_mg: dose, eszopiclone_extra_dose: extraBool, eszopiclone_extra_time: time });
+}
+
+async function saveSuppField(fields) {
+  try {
+    const r = await fetch('/api/supplements', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: new Date().toISOString().split('T')[0], ...fields }),
+    });
+    if (!r.ok) throw new Error();
+    const msg = document.getElementById('suppSaveMsg');
+    if (msg) { msg.textContent = '✓ Saved'; msg.style.display = 'block'; setTimeout(()=>msg.style.display='none', 1500); }
+  } catch { /* silent fail — retry on next save */ }
 }
 
 // ── BOOT ───────────────────────────────────────────────────────────────────────

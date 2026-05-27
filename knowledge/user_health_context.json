@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "version": "1.0",
+    "last_updated": "2026-05-26",
+    "purpose": "Static health context for Randy Daems — loaded into coach system prompt. Update when labs, meds, or supplements change."
+  },
+
+  "profile": {
+    "age": 51,
+    "current_weight_lb": 147,
+    "goal_weight_lb": 160,
+    "long_term_goal_lb": 175,
+    "height": "unknown — to be added",
+    "lifestyle": "Working professional with family and kids. Cannot follow extreme protocols like Bryan Johnson's (8:30 PM bedtime, noon last meal, full-day medical schedule). Will adopt evidence-based principles that fit a working parent's life.",
+    "annual_goal": "50-mile mountain hiking trek — train for endurance and lower-body strength"
+  },
+
+  "medical_context": {
+    "hashimotos_risk": {
+      "status": "Active autoimmune concern. TPOAb elevated at 194 IU/mL (ref: 0–34). Thyroid hormones (TSH, Free T3, Free T4) currently within normal range. Goal: reduce TPOAb through interventions before thyroid function is affected.",
+      "current_interventions": [
+        "Low-dose naltrexone (LDN) — started approx April 2026",
+        "Gluten-free diet — started approx April 2026, doctor-recommended, MEDICAL not preference",
+        "Selenium supplementation / Brazil nuts",
+        "Vitamin D3 + K2 (successfully improved D from 25.5 to 51.1 ng/mL)"
+      ],
+      "next_lab_retest": "A few weeks from 2026-05-26 — first real signal on whether TPOAb is responding",
+      "coach_rules": [
+        "NEVER suggest gluten as acceptable. Gluten-free is a medical intervention, not a dietary preference.",
+        "Track TPOAb trend as the primary Hashimoto's marker. Lab value alone is not enough — direction of change matters.",
+        "Oura HRV and sleep data are useful recovery proxies but cannot confirm or deny Hashimoto's status.",
+        "Anti-inflammatory food priorities directly support autoimmune reduction: EVOO, berries, fermented foods, cruciferous vegetables, omega-3."
+      ]
+    },
+    "kidney_context": {
+      "creatinine_latest": 1.61,
+      "egfr_latest": 51,
+      "status": "Creatinine elevated on most recent labs. eGFR 51 is below normal (60+). Context: high activity level, muscle mass, and possible dehydration at draw time can elevate creatinine. Creatine supplementation STOPPED because of this.",
+      "coach_rules": [
+        "Do NOT recommend creatine — Randy stopped it due to elevated creatinine/eGFR.",
+        "Monitor protein intake in context of kidney function — flag if protein targets seem aggressive relative to eGFR.",
+        "Note hydration as relevant to creatinine interpretation.",
+        "Flag any further eGFR decline at next labs as requiring clinician review."
+      ]
+    },
+    "glucose_triglycerides_flag": {
+      "glucose_value": 129,
+      "triglycerides_value": 182,
+      "fasting_status": "UNCERTAIN — Randy believes he may have been fasting but is not sure.",
+      "interpretation": "If fasting: glucose 129 is at the diabetes diagnostic threshold (126+) and triglycerides 182 is borderline high (150+). If non-fasting: less concerning but still warrants a confirmed fasting retest. NEXT LABS: confirm fasting status and retest both markers.",
+      "coach_rules": [
+        "Flag glucose and triglycerides as unresolved — confirmed fasting retest needed.",
+        "Do not assume non-fasting. Treat as potentially significant until confirmed."
+      ]
+    }
+  },
+
+  "medications": {
+    "wellbutrin_bupropion": {
+      "status": "Active prescription",
+      "purpose": "Depression management",
+      "coach_context": "Randy is open to reducing or eventually eliminating Wellbutrin if lifestyle interventions support mood stabilization. He will NOT pursue extreme interventions (e.g., psychedelic therapy). Path forward is through sleep optimization, exercise consistency, inflammation reduction, and Vitamin D adequacy — all already in the TrainAI protocol. NEVER suggest medication changes. Frame lifestyle improvements as supporting mental resilience. Any medication changes are conversations with his doctor.",
+      "tracking": "Yes/No taken daily"
+    },
+    "eszopiclone_lunesta": {
+      "status": "Active, being reduced",
+      "standard_dose_mg": 2,
+      "optional_extra_mg": 1,
+      "pattern": "2mg most nights at bedtime. Sometimes takes additional 1mg if waking at night (e.g., 4 AM). Goal is to reduce use over time.",
+      "coach_context": "Eszopiclone reduces sleep latency but may reduce deep and REM sleep quality at higher doses. Reduction goal aligns with improving natural sleep quality through other interventions.",
+      "tracking": "Dose taken (mg) + time + whether extra dose was needed"
+    },
+    "ldn_low_dose_naltrexone": {
+      "status": "Active — started approx April 2026",
+      "current_issue": "4.5mg at night may be too stimulating and causing sleep disruption. Lower dose or morning timing being considered with clinician.",
+      "purpose": "Hashimoto's / TPOAb reduction — immune modulation",
+      "tracking": "Dose mg + time taken + sleep quality that night + wakeups + next-day energy",
+      "coach_rules": [
+        "If Oura shows disrupted sleep on nights LDN was taken, flag this pattern for clinician discussion.",
+        "Do not recommend dose changes — these are clinician decisions.",
+        "Track LDN timing vs sleep HRV and efficiency to surface patterns."
+      ]
+    }
+  },
+
+  "supplements": {
+    "tracking_note": "Randy takes supplements 60-70% of the time. Simple daily checklist is more likely to be completed than detailed logging.",
+    "groups": {
+      "morning_daily_advantage": {
+        "label": "Daily Advantage",
+        "timing": "Morning",
+        "known_contents": "Multi-supplement morning pack (exact contents to be confirmed)",
+        "track_as": "boolean — taken today yes/no"
+      },
+      "afternoon_supplements": {
+        "label": "Afternoon Supplements",
+        "timing": "Afternoon",
+        "known_contents": [
+          "Fish oil — 1.5-2g EPA/DHA",
+          "Vitamin D3 + K2 — 2,000 IU D3",
+          "Selenium / Brazil nuts — dose unknown"
+        ],
+        "track_as": "boolean — taken today yes/no"
+      },
+      "nighttime_supplements": {
+        "label": "Nighttime Supplements",
+        "timing": "Before bed",
+        "known_contents": [
+          "Magnesium glycinate — 300-400mg",
+          "LMNT on gym days — electrolytes"
+        ],
+        "track_as": "boolean — taken today yes/no",
+        "note": "Eszopiclone is tracked separately under medications."
+      }
+    },
+    "stopped": {
+      "creatine": {
+        "reason": "Elevated creatinine on last labs (1.61 mg/dL, eGFR 51). Stopped until kidney function is clarified at next labs.",
+        "coach_rules": ["Do not recommend creatine. Do not suggest resuming without clear eGFR improvement and clinician guidance."]
+      }
+    }
+  },
+
+  "diet_constraints": {
+    "gluten_free": {
+      "status": "STRICT — medical intervention for Hashimoto's, not preference",
+      "started": "approx April 2026",
+      "coach_rules": ["Gluten-free is non-negotiable. Never suggest gluten-containing foods. Flag any recipe or food suggestion for GF compliance."]
+    },
+    "dairy": {
+      "status": "Mostly dairy-free / low lactose due to lactose intolerance. Some hard cheese tolerated.",
+      "coach_rules": ["Avoid dairy recommendations. Hard aged cheeses acceptable in small amounts."]
+    }
+  },
+
+  "labs_latest": {
+    "draw_date_approx": "March 2026",
+    "thyroid": {
+      "TSH": 1.78,
+      "Free_T3_pg_mL": 2.9,
+      "Free_T4_ng_dL": 1.22,
+      "TPOAb_IU_mL": 194,
+      "interpretation": "Thyroid function normal. Autoimmune activity elevated and stable. Next retest in a few weeks will show first signal from LDN + gluten-free intervention."
+    },
+    "vitamins": {
+      "Vitamin_D_ng_mL": 51.1,
+      "prior_D": 25.5,
+      "interpretation": "Major improvement. Now at low end of optimal range (50-80 ng/mL target). Continue D3+K2."
+    },
+    "metabolic": {
+      "glucose_mg_dL": 129,
+      "glucose_fasting_status": "UNCERTAIN",
+      "triglycerides_mg_dL": 182,
+      "triglycerides_fasting_status": "UNCERTAIN",
+      "HbA1c": "not yet tested — needed",
+      "fasting_insulin": "not yet tested — needed"
+    },
+    "kidney": {
+      "creatinine_mg_dL": 1.61,
+      "eGFR": 51,
+      "interpretation": "Below normal. Creatine stopped. Confirm with fasting retest and inform clinician."
+    },
+    "hormones": {
+      "total_testosterone_ng_dL": 531,
+      "free_testosterone": 9.7,
+      "DHEA_S": 192,
+      "interpretation": "Total testosterone stable. Free testosterone improved significantly (7.3 → 9.7) — likely related to Vitamin D optimization."
+    },
+    "inflammation": {
+      "hsCRP": "not yet tested — HIGH PRIORITY for next labs",
+      "ESR": "not yet tested"
+    }
+  },
+
+  "labs_next_priorities": [
+    "TPOAb — primary Hashimoto's signal",
+    "Confirmed FASTING glucose and triglycerides",
+    "HbA1c — first baseline needed",
+    "hsCRP — inflammation baseline (critical for anti-aging protocol)",
+    "eGFR / creatinine — track kidney function trend",
+    "Vitamin D — confirm sustained improvement",
+    "TgAb — second thyroid autoimmune marker not yet tested"
+  ],
+
+  "protocol_realism": {
+    "context": "Randy works in an office, has a family with kids, and cannot follow extreme protocols. The Bryan Johnson framework is a source of evidence-based principles, not a prescription to follow exactly.",
+    "practical_adaptations": {
+      "last_meal_time": "Target 7–8 PM (not noon). Gives 2-3 hours before a realistic 10–10:30 PM bedtime.",
+      "bedtime_target": "10–10:30 PM (not 8:30 PM)",
+      "morning_light": "10–15 min walk or outdoor time within 30 min of waking — achievable before work",
+      "sauna": "2–3x/week post-VASA workout if available — not daily",
+      "screen_wind_down": "30–45 min before bed — realistic with family life",
+      "exercise": "Already meeting or exceeding 6h/week protocol target",
+      "anti_inflammatory_foods": "Incorporate EVOO, berries, fermented foods into existing meals — no lifestyle overhaul needed"
+    },
+    "coach_rules": [
+      "Never recommend Bryan Johnson's exact schedule. Extract the principle, apply to real life.",
+      "Account for family and work constraints when suggesting behavior changes.",
+      "Frame recommendations as additions or swaps, not wholesale lifestyle overhauls.",
+      "Prioritize interventions with the highest evidence-to-effort ratio for someone with Randy's specific health profile."
+    ]
+  }
+}
