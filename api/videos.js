@@ -62,14 +62,16 @@ async function fetchPlaylistVideos(apiKey) {
   return videos;
 }
 
-// Batch-tag all videos in one Claude call (Haiku — fast and cheap for classification)
+// Batch-tag a list of videos in one Claude call (Haiku — fast and cheap for classification)
 async function tagVideos(videos) {
+  if (!videos.length) return [];
+
   const list = videos.map((v, i) =>
     `[${i}] Channel: ${v.channel} | Title: ${v.title} | Description: ${v.description.slice(0, 150)}`
   ).join('\n');
 
   const message = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
+    model: 'claude-haiku-4-5',
     max_tokens: 4000,
     messages: [{
       role: 'user',
@@ -137,7 +139,7 @@ export default async function handler(req, res) {
     });
   }
 
-  // POST {action: "sync"} — fetch playlist + tag + store
+  // POST {action: "sync"} — delta sync: only tag videos not already in the index
   if (req.method === 'POST') {
     const { action } = req.body ?? {};
     if (action !== 'sync') return res.status(400).json({ error: 'action must be "sync"' });
@@ -145,32 +147,54 @@ export default async function handler(req, res) {
     const apiKey = process.env.YOUTUBE_API_KEY;
     if (!apiKey) return res.status(500).json({ error: 'YOUTUBE_API_KEY not set in Vercel env vars' });
 
-    // Fetch all playlist videos
-    const rawVideos = await fetchPlaylistVideos(apiKey);
-    if (!rawVideos.length) return res.status(200).json({ ok: true, count: 0, message: 'Playlist appears empty or inaccessible' });
+    // Fetch current playlist from YouTube
+    const playlistVideos = await fetchPlaylistVideos(apiKey);
+    if (!playlistVideos.length) return res.status(200).json({ ok: true, count: 0, message: 'Playlist appears empty or inaccessible' });
 
-    // Batch-tag with Claude Haiku
-    const tags = await tagVideos(rawVideos);
+    // Load existing index from Redis
+    const existingRaw = await redis.get('trainai:videos:index');
+    const existingIndex = existingRaw ? JSON.parse(existingRaw) : [];
+    const existingById = Object.fromEntries(existingIndex.map(v => [v.video_id, v]));
 
-    // Merge tags back into video objects
-    const tagged = rawVideos.map((v, i) => {
-      const t = tags.find(t => t.index === i) ?? { category: 'general_fitness', source: 'other', tags: [] };
+    // Delta: which video_ids are new (not yet tagged)?
+    const playlistIds = new Set(playlistVideos.map(v => v.video_id));
+    const newVideos = playlistVideos.filter(v => !existingById[v.video_id]);
+    // Which videos were removed from the playlist?
+    const removedCount = existingIndex.filter(v => !playlistIds.has(v.video_id)).length;
+
+    // Only tag the new additions
+    const newTags = await tagVideos(newVideos);
+    const newTagged = newVideos.map((v, i) => {
+      const t = newTags.find(t => t.index === i) ?? { category: 'general_fitness', source: 'other', tags: [] };
       return { ...v, category: t.category, source: t.source, tags: t.tags };
     });
 
-    // Store in Redis — long TTL (7 days), sync manually when playlist changes
-    await redis.set('trainai:videos:index', JSON.stringify(tagged), { EX: 86400 * 7 });
+    // Merge: keep existing tagged videos still in the playlist + add newly tagged
+    const merged = [
+      ...existingIndex.filter(v => playlistIds.has(v.video_id)), // existing, still present
+      ...newTagged,                                                // new additions
+    ];
+
+    // Preserve playlist order (YouTube returns them in order added)
+    const orderMap = Object.fromEntries(playlistVideos.map((v, i) => [v.video_id, i]));
+    merged.sort((a, b) => (orderMap[a.video_id] ?? 999) - (orderMap[b.video_id] ?? 999));
+
+    // Store merged index — TTL reset to 7 days on every sync
+    await redis.set('trainai:videos:index', JSON.stringify(merged), { EX: 86400 * 7 });
     await redis.set('trainai:videos:last_synced', new Date().toISOString(), { EX: 86400 * 7 });
 
-    // Return a category breakdown so you can see what got tagged
+    // Category breakdown
     const breakdown = {};
-    tagged.forEach(v => { breakdown[v.category] = (breakdown[v.category] ?? 0) + 1; });
+    merged.forEach(v => { breakdown[v.category] = (breakdown[v.category] ?? 0) + 1; });
 
     return res.status(200).json({
       ok: true,
-      count: tagged.length,
+      total: merged.length,
+      added: newTagged.length,
+      removed: removedCount,
+      reused: existingIndex.length - removedCount,
       breakdown,
-      sample: tagged.slice(0, 5),
+      new_videos: newTagged.slice(0, 5), // preview of what was just added
     });
   }
 

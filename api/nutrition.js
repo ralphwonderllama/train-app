@@ -73,17 +73,33 @@ export default async function handler(req, res) {
 
       const lines = csv.split('\n').slice(1); // skip header row
       const saved = [];
-      const skipped = [];
+      const skippedParse = [];
+      const skippedManual = []; // dates where manual entry already exists — never overwrite
 
       for (const line of lines) {
         if (!line.trim()) continue;
         const entry = parseRow(line);
-        if (!entry) { skipped.push(line.slice(0, 40)); continue; }
+        if (!entry) { skippedParse.push(line.slice(0, 40)); continue; }
+
+        // Don't overwrite a manual entry — manual = real-time, CSV = weekly batch
+        const existing = await redis.get(`trainai:nutrition:${entry.date}`);
+        if (existing) {
+          const parsed = JSON.parse(existing);
+          if (parsed.source === 'manual') { skippedManual.push(entry.date); continue; }
+        }
+
         await redis.set(`trainai:nutrition:${entry.date}`, JSON.stringify(entry), { EX: 86400 * 90 });
         saved.push(entry.date);
       }
 
-      return res.status(200).json({ ok: true, saved: saved.length, skipped: skipped.length, dates: saved });
+      return res.status(200).json({
+        ok: true,
+        saved: saved.length,
+        skipped_parse_errors: skippedParse.length,
+        skipped_manual_entries: skippedManual.length,
+        dates: saved,
+        protected_dates: skippedManual, // so n8n can log which dates were protected
+      });
     }
 
     return res.status(400).json({ error: 'type must be daily_entry or batch_csv' });
