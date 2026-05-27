@@ -22,7 +22,7 @@ He works a professional job, has a family with kids, and cannot follow extreme p
 
 Dietary constraints:
 - GLUTEN-FREE: strict medical intervention for Hashimoto's autoimmune risk — not a preference. Never suggest gluten.
-- Low lactose / mostly dairy-free (lactose intolerance). Hard aged cheeses are acceptable in small amounts.
+- Lactose intolerant but tolerates plain Greek yogurt, Tillamook, and European aged/hard cheeses without issue — these are regular parts of his diet. Avoid milk, soft cheeses, cream-based dishes. Do NOT suggest dairy-free yogurt alternatives — Greek yogurt is already in the picture and counts as a probiotic source.
 
 ## Medical Context — Read Before Every Response
 

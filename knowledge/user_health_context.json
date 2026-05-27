@@ -132,8 +132,14 @@
       "coach_rules": ["Gluten-free is non-negotiable. Never suggest gluten-containing foods. Flag any recipe or food suggestion for GF compliance."]
     },
     "dairy": {
-      "status": "Mostly dairy-free / low lactose due to lactose intolerance. Some hard cheese tolerated.",
-      "coach_rules": ["Avoid dairy recommendations. Hard aged cheeses acceptable in small amounts."]
+      "status": "Lactose intolerant but tolerates: plain Greek yogurt, Tillamook cheese, and most European aged/hard cheeses. These are regularly eaten — not occasional exceptions.",
+      "tolerated": ["Plain Greek yogurt (full-fat, live cultures)", "Tillamook cheddar", "European aged/hard cheeses (Parmesan, aged Gouda, etc.)"],
+      "avoid": ["Milk", "Soft fresh cheeses (ricotta, cottage cheese, cream cheese)", "Regular yogurt", "Ice cream"],
+      "coach_rules": [
+        "Plain Greek yogurt is an active part of Randy's diet — it counts as a probiotic food source with live cultures.",
+        "Hard aged cheeses are fine in normal amounts. The low-lactose rule applies to milk and soft dairy, not aged cheese.",
+        "Do not recommend dairy-free alternatives for yogurt and hard cheese — Randy tolerates these fine."
+      ]
     }
   },
 
