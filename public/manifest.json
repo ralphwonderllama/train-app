@@ -1,7 +1,7 @@
 {
-  "name": "TrainAI - AI Personal Trainer",
-  "short_name": "TrainAI",
-  "description": "AI-powered personal training with real-time vitals calibration and adaptive protocols",
+  "name": "TRAIN",
+  "short_name": "TRAIN",
+  "description": "AI-powered personal health coaching — nutrition, fitness, sleep, and longevity",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

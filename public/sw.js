@@ -1,5 +1,5 @@
-// Service Worker for TrainAI PWA
-const CACHE_NAME = 'trainai-v1';
+// Service Worker for TRAIN PWA
+const CACHE_NAME = 'train-v2';
 const urlsToCache = [
   '/',
   '/index.html',
