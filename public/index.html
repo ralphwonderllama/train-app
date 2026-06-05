@@ -678,6 +678,20 @@
           <div class="loading"><div class="dot dot-dim pulse"></div></div>
         </div>
       </div>
+
+      <!-- Deep pattern analysis — loaded on demand -->
+      <div class="card" id="sleepAnalysisCard">
+        <div class="card-title" style="justify-content:space-between;">
+          <span>🔬 PATTERN ANALYSIS — 60 DAYS</span>
+          <button class="btn btn-sm" id="saRefreshBtn" onclick="loadSleepAnalysis(true)" style="display:none;">↻ REFRESH</button>
+        </div>
+        <div id="saContent">
+          <div style="font-size:11px;color:#444;margin-bottom:.875rem;line-height:1.6;">
+            Analyzes wake time clustering, SpO2 &amp; breathing disturbance trends, deep sleep patterns, and eszopiclone clearance alignment across the last 60 nights.
+          </div>
+          <button class="btn btn-primary btn-full" id="saLoadBtn" onclick="loadSleepAnalysis(false)">ANALYZE 60 NIGHTS</button>
+        </div>
+      </div>
     </div>
 
     <!-- ════════════════════════════════════════════════════
@@ -1866,6 +1880,204 @@ function copyGroceryList() {
     msg.style.display = 'block';
     setTimeout(() => msg.style.display = 'none', 2500);
   }).catch(() => alert('Copy failed — try long-pressing the list'));
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SLEEP PATTERN ANALYSIS
+// ════════════════════════════════════════════════════════════════════════════════
+
+let saData = null;
+
+async function loadSleepAnalysis(refresh = false) {
+  const content = document.getElementById('saContent');
+  const loadBtn = document.getElementById('saLoadBtn');
+  const refreshBtn = document.getElementById('saRefreshBtn');
+
+  content.innerHTML = '<div class="loading"><div class="dot dot-red pulse"></div>ANALYZING 60 NIGHTS OF DATA…</div>';
+  if (loadBtn) loadBtn.style.display = 'none';
+  if (refreshBtn) refreshBtn.style.display = 'none';
+
+  try {
+    const url = refresh ? '/api/sleep-analysis?refresh=true' : '/api/sleep-analysis';
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(await r.text());
+    saData = await r.json();
+    renderSleepAnalysis(saData);
+    if (refreshBtn) refreshBtn.style.display = 'block';
+  } catch (e) {
+    content.innerHTML = `<div class="alert alert-red">⚡ Analysis failed: ${e.message}</div>`;
+  }
+}
+
+function saBar(label, count, maxCount, color) {
+  const pct = maxCount > 0 ? Math.round((count / maxCount) * 100) : 0;
+  return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+    <div style="font-size:9px;color:#555;width:36px;text-align:right;flex-shrink:0;">${label}</div>
+    <div style="flex:1;height:12px;background:#0d0d0d;border-radius:2px;overflow:hidden;">
+      <div style="height:100%;width:${pct}%;background:${color};border-radius:2px;"></div>
+    </div>
+    <div style="font-size:10px;font-weight:700;color:#fff;width:20px;flex-shrink:0;">${count||''}</div>
+  </div>`;
+}
+
+function renderSleepAnalysis(d) {
+  const content = document.getElementById('saContent');
+  const wp  = d.wake_pattern;
+  const sp  = d.spo2;
+  const ds  = d.deep_sleep;
+  const sc  = d.sleep_scores;
+  const hrv = d.hrv;
+  const aa  = d.apnea_assessment;
+  const esz = d.eszopiclone_analysis;
+
+  // Wake hour histogram — show hours 10pm–8am (sleep window)
+  const dist = wp.hour_distribution;
+  const sleepHours = [...Array(11).keys()].map(i => (i + 22) % 24); // 22,23,0,1,2,3,4,5,6,7,8
+  const maxBucket = Math.max(...dist.filter(Boolean), 1);
+
+  const hourLabels = {22:'10p',23:'11p',0:'12a',1:'1a',2:'2a',3:'3a',4:'4a',5:'5a',6:'6a',7:'7a',8:'8a'};
+
+  const histHtml = sleepHours.map(h => {
+    const isHot = h >= 3 && h <= 5;
+    const clr = isHot ? 'var(--red)' : dist[h] > 0 ? '#333' : '#111';
+    return saBar(hourLabels[h], dist[h], maxBucket, clr);
+  }).join('');
+
+  // SpO2 badge
+  const spo2Color = sp.avg_60d >= 96 ? 'var(--green)' : sp.avg_60d >= 95 ? 'var(--yellow)' : 'var(--red)';
+  const bdiColor  = !sp.avg_breathing_disturbance_index ? '#555'
+    : sp.avg_breathing_disturbance_index > 10 ? 'var(--red)'
+    : sp.avg_breathing_disturbance_index > 6  ? 'var(--yellow)'
+    : 'var(--green)';
+
+  // Apnea signals
+  const signalsHtml = aa.signals.map(s => {
+    const clr = s.severity === 'high' ? 'var(--red)' : s.severity === 'medium' ? 'var(--yellow)' : 'var(--green)';
+    const icon = s.severity === 'high' ? '⚠' : s.severity === 'medium' ? '◉' : '✓';
+    return `<div style="display:flex;gap:8px;align-items:flex-start;padding:.375rem 0;border-bottom:1px solid #0a0a0a;">
+      <div style="color:${clr};font-size:12px;flex-shrink:0;margin-top:1px;">${icon}</div>
+      <div>
+        <div style="font-size:12px;color:#fff;font-weight:600;">${s.label}</div>
+        <div style="font-size:10px;color:#444;">${s.detail}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Risk level styling
+  const riskHigh = aa.risk_level.startsWith('elevated');
+  const riskMed  = aa.risk_level.startsWith('moderate');
+  const riskClr  = riskHigh ? 'var(--red)' : riskMed ? 'var(--yellow)' : 'var(--green)';
+  const riskAlert = riskHigh ? 'alert-red' : riskMed ? 'alert-yellow' : 'alert-green';
+
+  // Eszopiclone interpretation
+  const eszClr = esz.pct_waking_in_esz_window >= 60 ? 'var(--red)'
+    : esz.pct_waking_in_esz_window >= 35 ? 'var(--yellow)' : 'var(--green)';
+
+  content.innerHTML = `
+    <div style="font-size:9px;color:#333;margin-bottom:1rem;">
+      ${d.days_analyzed} nights analyzed · ${d.date_range.from} → ${d.date_range.to}
+      ${d.from_cache ? ' · <span style="color:#333;">cached</span>' : ''}
+    </div>
+
+    <!-- Wake time distribution -->
+    <div style="margin-bottom:1.25rem;">
+      <div class="card-title" style="margin-bottom:.625rem;">WAKE TIME DISTRIBUTION</div>
+      ${histHtml}
+      <div style="font-size:10px;color:#444;margin-top:.5rem;line-height:1.5;">
+        <span style="color:var(--red);">Red = 3–5 AM window</span> (eszopiclone clearance zone)
+        · ${wp.in_3_5am_window} of ${wp.total_meaningful_awakenings} meaningful awakenings (≥10 min) occurred between 3–5 AM
+        · Peak wake hour: <strong style="color:#fff;">${wp.peak_wake_hour}:00</strong>
+      </div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid #111;margin:1rem 0;">
+
+    <!-- SpO2 & Breathing -->
+    <div style="margin-bottom:1.25rem;">
+      <div class="card-title" style="margin-bottom:.625rem;">SpO2 &amp; BREATHING DISTURBANCE</div>
+      <div class="stats-3" style="margin-bottom:.625rem;">
+        <div class="stat-box">
+          <div class="stat-val" style="font-size:18px;color:${spo2Color};">${sp.avg_60d ?? '—'}%</div>
+          <div class="stat-lbl">Avg SpO2 60d</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="font-size:18px;color:${bdiColor};">${sp.avg_breathing_disturbance_index ?? '—'}</div>
+          <div class="stat-lbl">Avg BDI</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="font-size:18px;color:${sp.nights_below_95 > 5 ? 'var(--red)' : sp.nights_below_95 > 0 ? 'var(--yellow)' : 'var(--green)'};">${sp.nights_below_95}</div>
+          <div class="stat-lbl">Nights &lt;95%</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:#444;line-height:1.5;">
+        BDI (Breathing Disturbance Index): Normal &lt;6 · Borderline 6–10 · Concerning &gt;10<br>
+        SpO2 &lt;95% on average = clinically notable · &lt;94% = concerning
+      </div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid #111;margin:1rem 0;">
+
+    <!-- Deep sleep timing -->
+    <div style="margin-bottom:1.25rem;">
+      <div class="card-title" style="margin-bottom:.625rem;">DEEP SLEEP TIMING</div>
+      <div style="font-size:20px;font-weight:700;color:#fff;margin-bottom:3px;">
+        ${ds.avg_pct_in_first_third ?? '—'}%
+        <span style="font-size:11px;font-weight:400;color:#555;">in first ⅓ of night</span>
+      </div>
+      <div style="font-size:10px;color:#444;line-height:1.5;">${ds.interpretation}</div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid #111;margin:1rem 0;">
+
+    <!-- HRV -->
+    <div style="margin-bottom:1.25rem;">
+      <div class="card-title" style="margin-bottom:.625rem;">HRV TREND</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.625rem;">
+        <div>
+          <div style="font-size:10px;color:#555;margin-bottom:2px;">14-DAY AVG</div>
+          <div style="font-size:22px;font-weight:700;">${hrv.avg_14d ?? '—'}</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:#555;margin-bottom:2px;">60-DAY AVG</div>
+          <div style="font-size:22px;font-weight:700;color:#555;">${hrv.avg_60d ?? '—'}</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:#444;margin-top:4px;">Trend: <strong style="color:${hrv.trend==='improving'?'var(--green)':hrv.trend==='declining'?'var(--red)':'var(--gray)'}">${hrv.trend}</strong></div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid #111;margin:1rem 0;">
+
+    <!-- Apnea signals -->
+    <div style="margin-bottom:1.25rem;">
+      <div class="card-title" style="margin-bottom:.625rem;">APNEA SIGNALS</div>
+      <div class="alert ${riskAlert}" style="margin-bottom:.875rem;">
+        <span style="font-size:14px;">Risk level: ${aa.risk_level.toUpperCase()}</span>
+      </div>
+      ${signalsHtml}
+      <div style="font-size:9px;color:#2a2a2a;margin-top:.625rem;line-height:1.5;">${aa.disclaimer}</div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid #111;margin:1rem 0;">
+
+    <!-- Eszopiclone analysis -->
+    <div style="margin-bottom:.5rem;">
+      <div class="card-title" style="margin-bottom:.625rem;">ESZOPICLONE CLEARANCE PATTERN</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.625rem;margin-bottom:.625rem;">
+        <div class="stat-box">
+          <div class="stat-val" style="font-size:22px;color:${eszClr};">${esz.pct_waking_in_esz_window ?? '—'}%</div>
+          <div class="stat-lbl">Nights with 3–5 AM wake</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="font-size:18px;">~4:30 AM</div>
+          <div class="stat-lbl">Expected 50% clearance</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#aaa;line-height:1.6;background:#070707;border:1px solid #111;border-radius:2px;padding:.75rem;">${esz.interpretation}</div>
+      <div style="font-size:10px;color:#333;margin-top:.5rem;line-height:1.5;">
+        Eszopiclone half-life ~6h · Taken ~10:30 PM → 50% cleared by ~4:30 AM · This aligns with REM-dominant late sleep, when upper airway muscle tone is lowest — the same window where untreated apnea events peak.
+      </div>
+    </div>
+  `;
 }
 
 // ── BOOT ───────────────────────────────────────────────────────────────────────
