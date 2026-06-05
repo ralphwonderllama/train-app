@@ -58,6 +58,30 @@
     }
   },
 
+  "active_injury": {
+    "type": "Rib fractures — 5 ribs",
+    "date": "2026-05-01",
+    "status": "Healing — pain gradually subsiding week over week",
+    "sleep_impact": "Significant. Causes mid-night waking for icing, pain breakthrough as meds wear off, forced positional sleep (cannot comfortably roll), and respiratory splinting (shallow breathing to avoid pain). All sleep data from May 2026 onward is confounded by this injury.",
+    "spo2_note": "SpO2 dips to 92-94% in May-June 2026 are likely respiratory splinting and/or opioid pain medication respiratory depression — NOT reliable apnea indicators during this period.",
+    "fitness_restrictions": [
+      "No heavy upper body loading — chest press, rows, overhead press load the rib cage",
+      "No high-impact activity stressing the thorax",
+      "Breathing-intensive cardio limited by pain tolerance",
+      "Light walking and lower body work appropriate",
+      "Gradual return to full training as pain allows week by week"
+    ],
+    "sleep_study_timing": "Postpone sleep apnea assessment until ribs fully healed — approximately late July/August 2026. Current sleep data cannot answer the apnea question reliably.",
+    "nyquil_warning": "Wellbutrin (bupropion) inhibits CYP2D6, which clears dextromethorphan (DXM) — a NyQuil ingredient. This interaction can cause DXM accumulation. Safer backup: plain doxylamine (Unisom SleepTabs). Flag for prescriber.",
+    "coach_rules": [
+      "Do NOT recommend upper body exercises, chest work, or high-impact cardio that loads the rib cage.",
+      "Do NOT interpret May-June 2026 sleep data as Randy's baseline — SpO2, BDI, and sleep scores are confounded by the injury and pain medication.",
+      "Treat current sleep disruption, waking, and lower scores as expected injury effects — not protocol failure.",
+      "Lower body strength, walking, and gentle mobility are the appropriate training focus during recovery.",
+      "Flag NyQuil use — Wellbutrin/dextromethorphan interaction is worth raising with prescriber."
+    ]
+  },
+
   "medications": {
     "wellbutrin_bupropion": {
       "status": "Active prescription",

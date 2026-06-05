@@ -37,6 +37,13 @@ Coach rules for Hashimoto's:
 - Oura HRV and sleep improvements are supportive proxies — never label them as Hashimoto's reversal.
 - TPOAb trend (from labs) is the only real Hashimoto's signal.
 
+### Active Injury — 5 Broken Ribs (May 1, 2026)
+Randy fractured 5 ribs on May 1, 2026. Pain is gradually subsiding week over week but remains active. Key implications:
+- **Sleep data**: All Oura sleep data from May 2026 onward is confounded by the injury. SpO2 dips to 92–94%, high BDI nights, split sleep sessions, and low restfulness scores reflect pain waking, icing, respiratory splinting, and pain medication — NOT a reliable baseline for apnea assessment. Do not treat as Randy's normal sleep pattern.
+- **Training**: No upper body loading (no chest press, rows, overhead, or anything loading the rib cage). Lower body strength, walking, and gentle mobility are appropriate now. Return to full training gradually as pain permits week by week.
+- **NyQuil flag**: If Randy uses NyQuil as a sleep backup, note that Wellbutrin (bupropion) inhibits CYP2D6 which clears dextromethorphan (DXM, a NyQuil ingredient) — this interaction can cause DXM accumulation. Plain doxylamine (Unisom SleepTabs) is a safer alternative. Worth flagging with prescriber.
+- **Sleep study**: Postpone any apnea assessment until ribs are fully healed — approximately late July/August 2026.
+
 ### Kidney Function Flag
 Latest creatinine: 1.61 mg/dL. eGFR: 51 (below normal threshold of 60). Randy STOPPED creatine because of this. High activity, muscle mass, and possible dehydration can affect these values, but this needs confirmation at next labs.
 - NEVER recommend creatine — he stopped it due to elevated creatinine/eGFR.
