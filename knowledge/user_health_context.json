@@ -72,13 +72,36 @@
       "Gradual return to full training as pain allows week by week"
     ],
     "sleep_study_timing": "Postpone sleep apnea assessment until ribs fully healed — approximately late July/August 2026. Current sleep data cannot answer the apnea question reliably.",
-    "nyquil_warning": "Wellbutrin (bupropion) inhibits CYP2D6, which clears dextromethorphan (DXM) — a NyQuil ingredient. This interaction can cause DXM accumulation. Safer backup: plain doxylamine (Unisom SleepTabs). Flag for prescriber.",
+    "pain_medications": {
+      "hydrocodone": {
+        "status": "Active, tapering — now at 1/day (down from higher dose earlier in recovery)",
+        "timing": "Variable — sometimes daytime, sometimes at night. Never taken same night as gabapentin.",
+        "sleep_relevance": "Opioid respiratory depressant. Nighttime doses directly explain SpO2 dips during sleep. The 92% SpO2 night and other low readings are consistent with nighttime hydrocodone use. NOT evidence of apnea."
+      },
+      "gabapentin": {
+        "status": "PRN (as needed) for pain — used on select nights as an alternative to hydrocodone, never combined with it",
+        "sleep_relevance": "CNS depressant. Can suppress breathing during sleep, especially at higher doses. On nights gabapentin is taken, SpO2 may be somewhat lower than baseline.",
+        "note": "Randy does NOT combine hydrocodone and gabapentin. They are used as alternatives, not together."
+      }
+    },
+    "congestion": {
+      "status": "Intermittent nasal congestion before bed and during night waking",
+      "nyquil_concern": "Currently using NyQuil for congestion relief. Wellbutrin (bupropion) inhibits CYP2D6 — the enzyme that clears dextromethorphan (DXM, in NyQuil). This can cause DXM accumulation. Additionally, stacking doxylamine (NyQuil antihistamine) on top of eszopiclone and hydrocodone/gabapentin increases CNS depression load.",
+      "safer_alternatives": [
+        "Nasal strips (Breathe Right) — mechanical, no medication, no interactions",
+        "Saline nasal rinse (NeilMed or Neti pot) before bed",
+        "Bedroom humidifier if air is dry",
+        "Plain pseudoephedrine decongestant (no DXM) if congestion is severe"
+      ],
+      "doctor_flag": "Raise NyQuil use with doctor — both the Wellbutrin/DXM interaction and the added sedation load on top of other CNS depressants."
+    },
     "coach_rules": [
       "Do NOT recommend upper body exercises, chest work, or high-impact cardio that loads the rib cage.",
-      "Do NOT interpret May-June 2026 sleep data as Randy's baseline — SpO2, BDI, and sleep scores are confounded by the injury and pain medication.",
+      "Do NOT interpret May-June 2026 sleep data as Randy's baseline — SpO2, BDI, and sleep scores are confounded by the injury, pain medications, and respiratory splinting.",
       "Treat current sleep disruption, waking, and lower scores as expected injury effects — not protocol failure.",
       "Lower body strength, walking, and gentle mobility are the appropriate training focus during recovery.",
-      "Flag NyQuil use — Wellbutrin/dextromethorphan interaction is worth raising with prescriber."
+      "If NyQuil or hydrocodone at night is mentioned, note the Wellbutrin/DXM interaction and the opioid+gabapentin respiratory depression concern.",
+      "Suggest nasal strips or saline rinse as alternatives to NyQuil for congestion."
     ]
   },
 
