@@ -1338,26 +1338,27 @@ function renderVids(videos) {
 async function syncVideos() {
   const btn=document.getElementById('syncBtn');
   const msg=document.getElementById('vidSyncMsg');
-  btn.textContent='SYNCING…'; btn.disabled=true;
-  msg.style.display='none';
+  btn.style.display='none';
+  msg.style.display='block'; msg.style.color='var(--gray)';
+  msg.textContent='SYNCING…';
   try {
     const r=await fetch('/api/videos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sync'})});
     const d=await r.json();
     if (d.ok) {
-      msg.style.display='block'; msg.style.color='var(--green)';
+      msg.style.color='var(--green)';
       const rmv=d.removed>0?` · ${d.removed} removed`:'';
       msg.textContent=`✓ +${d.added} new videos${rmv} · ${d.total} total`;
       S.videos=null;
       await loadVideos(S.videoCat);
     } else {
-      msg.style.display='block'; msg.style.color='var(--red)';
+      msg.style.color='var(--red)';
       msg.textContent=d.error||'Sync failed';
     }
   } catch {
-    msg.style.display='block'; msg.style.color='var(--red)';
+    msg.style.color='var(--red)';
     msg.textContent='Sync failed — check YOUTUBE_API_KEY in Vercel';
   }
-  btn.textContent='SYNC PLAYLIST'; btn.disabled=false;
+  btn.style.display=''; btn.disabled=false;
 }
 
 // ════════════════════════════════════════════════════════════════════════════════
