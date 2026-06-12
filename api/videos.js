@@ -137,13 +137,16 @@ export default async function handler(req, res) {
     });
   }
 
-  // POST {action: "sync"} — delta sync: only tag videos not already in the index
+  // POST {action: "sync", force: true} — force clears existing index and re-tags all
   if (req.method === 'POST') {
-    const { action } = req.body ?? {};
+    const { action, force } = req.body ?? {};
     if (action !== 'sync') return res.status(400).json({ error: 'action must be "sync"' });
 
     const apiKey = process.env.YOUTUBE_API_KEY;
     if (!apiKey) return res.status(500).json({ error: 'YOUTUBE_API_KEY not set in Vercel env vars' });
+
+    // Force-clear existing index so all videos get re-tagged
+    if (force) await redis.del('trainai:videos:index');
 
     // Fetch current playlist from YouTube
     const playlistVideos = await fetchPlaylistVideos(apiKey);
