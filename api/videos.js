@@ -62,57 +62,44 @@ async function fetchPlaylistVideos(apiKey) {
   return videos;
 }
 
-// Batch-tag a list of videos in chunks (Haiku — fast and cheap for classification)
-async function tagVideos(videos) {
-  if (!videos.length) return [];
+// Keyword-based tagger — instant, no API call, works from title alone
+const RULES = [
+  { cat: 'hip_mobility',         kw: ['hip','glute activation','hip flexor','piriformis','it band','iliotibial','groin'] },
+  { cat: 'shoulder_mobility',    kw: ['shoulder mobility','thoracic','overhead range','rotator cuff','impingement','t-spine'] },
+  { cat: 'spine_mobility',       kw: ['spine','spinal','lower back mobility','back mobility','lumbar','disc'] },
+  { cat: 'full_body_flexibility', kw: ['stretch','flexibility','yoga','morning routine','stiff','mobility routine','move better','movement problem','ankl'] },
+  { cat: 'posture',              kw: ['posture','alignment','forward head','text neck','rounded'] },
+  { cat: 'cardio_conditioning',  kw: ['cardio','hiit','conditioning','endurance','zone 2','vo2','aerobic','fat loss','fat burn'] },
+  { cat: 'strength_back',        kw: ['back','lat','lats','row','deadlift','pulldown','pull-up','pullup','pull up','rhomboid','trap','rear delt'] },
+  { cat: 'strength_chest',       kw: ['chest','pec','bench','push-up','pushup','push up','pectoral'] },
+  { cat: 'strength_shoulders',   kw: ['shoulder','delt','overhead press','military press','lateral raise'] },
+  { cat: 'strength_arms',        kw: ['bicep','tricep','arm','curl','forearm','elbow'] },
+  { cat: 'strength_legs',        kw: ['leg','quad','hamstring','glute','squat','lunge','calf','calves','knee','rdl','romanian','step up','hip thrust'] },
+  { cat: 'strength_core',        kw: ['core','ab ','abs','abdominal','oblique','plank','six pack','six-pack','crunch'] },
+];
 
-  const CHUNK = 20;
-  const allTags = [];
-
-  for (let start = 0; start < videos.length; start += CHUNK) {
-    const chunk = videos.slice(start, start + CHUNK);
-    const list = chunk.map((v, i) =>
-      `[${i}] Channel: ${v.channel} | Title: ${v.title} | Description: ${v.description.slice(0, 150)}`
-    ).join('\n');
-
-    try {
-      const message = await anthropic.messages.create({
-        model: 'claude-haiku-4-5',
-        max_tokens: 2000,
-        messages: [{
-          role: 'user',
-          content: `You are tagging fitness videos for a personal training app used by a 51-year-old hybrid athlete (lifts + hikes + cycles). His main goals are: gaining muscle mass, hiking endurance, hip and shoulder mobility, and back development.
-
-Tag each video with the SINGLE most relevant category from this list:
-${CATEGORIES.join(', ')}
-
-Also identify the source type:
-- "athleanx" if channel is AthleanX or Jeff Cavaliere
-- "moves_method" if channel is Moves Method or similar mobility-focused
-- "other" for anything else
-
-Return ONLY a JSON array — no explanation, no markdown. One object per video, in the same order as the input list.
-Format: [{"index": 0, "category": "strength_back", "source": "athleanx", "tags": ["back", "lats", "width"]}, ...]
-The "tags" field should have 2-4 specific muscle groups or movement patterns.
-
-Videos to classify:
-${list}`,
-        }],
-      });
-
-      const text = message.content[0].text.trim();
-      const json = text.startsWith('[') ? text : text.slice(text.indexOf('['));
-      const parsed = JSON.parse(json);
-      // Re-index to absolute positions
-      parsed.forEach(t => { t.index = start + t.index; });
-      allTags.push(...parsed);
-    } catch {
-      // Fallback for this chunk
-      chunk.forEach((_, i) => allTags.push({ index: start + i, category: 'general_fitness', source: 'other', tags: [] }));
-    }
+function keywordTag(video) {
+  const text = (video.title + ' ' + video.description).toLowerCase();
+  for (const rule of RULES) {
+    if (rule.kw.some(k => text.includes(k))) return rule.cat;
   }
+  return 'general_fitness';
+}
 
-  return allTags;
+function sourceTag(channel) {
+  const c = (channel || '').toLowerCase();
+  if (c.includes('athlean') || c.includes('cavaliere')) return 'athleanx';
+  if (c.includes('moves') || c.includes('movesmethod')) return 'moves_method';
+  return 'other';
+}
+
+function tagVideos(videos) {
+  return videos.map((v, i) => ({
+    index: i,
+    category: keywordTag(v),
+    source: sourceTag(v.channel),
+    tags: [],
+  }));
 }
 
 export default async function handler(req, res) {
