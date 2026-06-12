@@ -55,17 +55,40 @@
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* ── TOP NAV ─────────────────────────────────────────── */
-    #bottomNav {
+    /* ── GLOBAL HEADER ───────────────────────────────────── */
+    #appHeader {
       flex-shrink: 0;
-      order: -1;
-      height: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
+      background: #000;
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    /* Row 1: TRAIN + date */
+    #headerRow1 {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: 10px 1rem 4px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    #headerBrand {
+      font-family: "Poppins", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+    #headerDate {
+      font-size: 10px;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    /* Row 2: nav tabs */
+    #bottomNav {
+      display: flex;
       background: #0d0d0d;
       border-bottom: 1px solid #1e1e1e;
-      display: flex;
-      align-items: flex-end;
-      padding-bottom: 6px;
-      padding-top: env(safe-area-inset-top, 0px);
     }
 
     .nav-tab {
@@ -73,8 +96,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
-      padding: 5px 4px;
+      gap: 2px;
+      padding: 7px 4px 6px;
       background: none;
       border: none;
       color: #444;
@@ -88,7 +111,19 @@
       -webkit-tap-highlight-color: transparent;
     }
     .nav-tab.active { color: var(--red); }
-    .nav-icon { font-size: 19px; line-height: 1; }
+    .nav-icon { font-size: 18px; line-height: 1; }
+
+    /* Row 3: section context */
+    #headerContext {
+      padding: 5px 1rem;
+      background: #080808;
+      border-bottom: 1px solid #1a1a1a;
+      font-family: "Audiowide", sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--gray);
+    }
 
     /* ── SCREEN HEADER ──────────────────────────────────── */
     .s-head { margin-bottom: 1.25rem; }
@@ -514,16 +549,42 @@
 </head>
 <body>
 <div id="app">
+
+  <!-- ── GLOBAL 3-ROW HEADER ──────────────────────────────── -->
+  <header id="appHeader">
+    <div id="headerRow1">
+      <div id="headerBrand">TRAIN</div>
+      <div id="headerDate">—</div>
+    </div>
+    <nav id="bottomNav">
+      <button class="nav-tab active" onclick="switchTab('sCoach',this)" data-context="COACH">
+        <div class="nav-icon">⚡</div><span>Coach</span>
+      </button>
+      <button class="nav-tab" onclick="switchTab('sNutrition',this)" data-context="NUTRITION">
+        <div class="nav-icon">🥗</div><span>Nutr</span>
+      </button>
+      <button class="nav-tab" onclick="switchTab('sFitness',this)" data-context="FITNESS">
+        <div class="nav-icon">💪</div><span>Fit</span>
+      </button>
+      <button class="nav-tab" onclick="switchTab('sSleep',this)" data-context="SLEEP">
+        <div class="nav-icon">🌙</div><span>Sleep</span>
+      </button>
+      <button class="nav-tab" onclick="switchTab('sLog',this)" data-context="LOG">
+        <div class="nav-icon">📋</div><span>Log</span>
+      </button>
+      <button class="nav-tab" onclick="switchTab('sGrocery',this)" data-context="SHOP">
+        <div class="nav-icon">🛒</div><span>Shop</span>
+      </button>
+    </nav>
+    <div id="headerContext">COACH</div>
+  </header>
+
   <div class="screen-wrap" id="screenWrap">
 
     <!-- ════════════════════════════════════════════════════
          SCREEN 1 — COACH
     ════════════════════════════════════════════════════ -->
     <div class="screen active" id="sCoach">
-      <div class="s-head">
-        <div class="brand">TRAIN</div>
-        <div class="s-sub" id="coachDate">—</div>
-      </div>
 
       <!-- Quick-status badges -->
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;" id="statusBadges">
@@ -559,10 +620,6 @@
          SCREEN 2 — NUTRITION
     ════════════════════════════════════════════════════ -->
     <div class="screen" id="sNutrition">
-      <div class="s-head">
-        <div class="s-title">NUTRITION</div>
-        <div class="s-sub" id="nutDate">—</div>
-      </div>
 
       <!-- Targets (from coach) -->
       <div class="card">
@@ -608,10 +665,6 @@
          SCREEN 3 — FITNESS
     ════════════════════════════════════════════════════ -->
     <div class="screen" id="sFitness">
-      <div class="s-head">
-        <div class="s-title">FITNESS</div>
-        <div class="s-sub" id="fitDate">—</div>
-      </div>
 
       <!-- Day status -->
       <div class="card">
@@ -647,10 +700,6 @@
          SCREEN 4 — SLEEP
     ════════════════════════════════════════════════════ -->
     <div class="screen" id="sSleep">
-      <div class="s-head">
-        <div class="s-title">SLEEP</div>
-        <div class="s-sub" id="sleepDate">—</div>
-      </div>
 
       <div class="stats-3">
         <div class="stat-box"><div class="stat-val" id="slScore">—</div><div class="stat-lbl">Sleep</div></div>
@@ -701,10 +750,6 @@
          SCREEN 5 — LOG
     ════════════════════════════════════════════════════ -->
     <div class="screen" id="sLog">
-      <div class="s-head">
-        <div class="s-title">LOG</div>
-        <div class="s-sub">GOALS · WEIGHT · GYM · CSV</div>
-      </div>
 
       <!-- Goals & Adventures -->
       <div class="card card-accent-red">
@@ -904,10 +949,6 @@
          SCREEN 6 — GROCERY
     ════════════════════════════════════════════════════ -->
     <div class="screen" id="sGrocery">
-      <div class="s-head">
-        <div class="s-title">GROCERY</div>
-        <div class="s-sub">SMART NUDGES · YOUR HEALTH PROFILE</div>
-      </div>
 
       <!-- Weekly anti-inflammatory hits tracker -->
       <div class="card card-accent-green">
@@ -937,37 +978,15 @@
     </div>
 
   </div><!-- /screen-wrap -->
-
-  <!-- ── BOTTOM NAV ─────────────────────────────────────── -->
-  <nav id="bottomNav">
-    <button class="nav-tab active" onclick="switchTab('sCoach',this)">
-      <div class="nav-icon">⚡</div><span>Coach</span>
-    </button>
-    <button class="nav-tab" onclick="switchTab('sNutrition',this)">
-      <div class="nav-icon">🥗</div><span>Nutr</span>
-    </button>
-    <button class="nav-tab" onclick="switchTab('sFitness',this)">
-      <div class="nav-icon">💪</div><span>Fit</span>
-    </button>
-    <button class="nav-tab" onclick="switchTab('sSleep',this)">
-      <div class="nav-icon">🌙</div><span>Sleep</span>
-    </button>
-    <button class="nav-tab" onclick="switchTab('sLog',this)">
-      <div class="nav-icon">📋</div><span>Log</span>
-    </button>
-    <button class="nav-tab" onclick="switchTab('sGrocery',this)">
-      <div class="nav-icon">🛒</div><span>Shop</span>
-    </button>
-  </nav>
 </div><!-- /app -->
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────────────────────
 const S = { coach:null, nutrition:null, oura:null, videos:null, weight:null, videoCat:'all' };
 
-// ── DATE LABELS ────────────────────────────────────────────────────────────────
+// ── DATE LABEL ────────────────────────────────────────────────────────────────
 const dateLabel = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).toUpperCase();
-document.querySelectorAll('#coachDate,#nutDate,#fitDate,#sleepDate').forEach(el=>el.textContent=dateLabel);
+document.getElementById('headerDate').textContent = dateLabel;
 
 // ── NAV ────────────────────────────────────────────────────────────────────────
 function switchTab(id, tabEl) {
@@ -975,6 +994,7 @@ function switchTab(id, tabEl) {
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   tabEl.classList.add('active');
+  document.getElementById('headerContext').textContent = tabEl.dataset.context || '';
   document.getElementById('screenWrap').scrollTop = 0;
   if (id==='sNutrition') initNutrition();
   if (id==='sFitness')   initFitness();
