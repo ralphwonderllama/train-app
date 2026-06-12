@@ -41,30 +41,31 @@
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding-top: env(safe-area-inset-top, 0px);
     }
 
     .screen-wrap {
       flex: 1;
       min-height: 0;
-      overflow-y: auto;
+      overflow-y: scroll;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
-      padding: 1.25rem 1rem 1.5rem;
+      padding: 1.25rem 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
     }
 
     .screen { display: none; }
     .screen.active { display: block; }
 
-    /* ── BOTTOM NAV ─────────────────────────────────────── */
+    /* ── TOP NAV ─────────────────────────────────────────── */
     #bottomNav {
       flex-shrink: 0;
-      height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px));
+      order: -1;
+      height: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
       background: #0d0d0d;
-      border-top: 1px solid #1e1e1e;
+      border-bottom: 1px solid #1e1e1e;
       display: flex;
-      align-items: flex-start;
-      padding-top: 6px;
+      align-items: flex-end;
+      padding-bottom: 6px;
+      padding-top: env(safe-area-inset-top, 0px);
     }
 
     .nav-tab {
