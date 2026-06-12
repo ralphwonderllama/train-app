@@ -25,11 +25,12 @@
     }
 
     html, body {
-      height: 100%;
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
       overflow: hidden;
+      background: #000;
     }
     body {
-      background: #000;
       color: #fff;
       font-family: "Nunito Sans", sans-serif;
     }
@@ -38,18 +39,19 @@
     #app {
       max-width: 430px;
       margin: 0 auto;
-      height: 100dvh;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
 
     .screen-wrap {
       flex: 1;
       min-height: 0;
-      overflow-y: scroll;
+      overflow-y: auto;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       padding: 1.25rem 1rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
     }
 
@@ -194,6 +196,8 @@
       justify-content: space-between;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      touch-action: manipulation;
+      padding: 4px 0;
     }
     .accordion-header .accordion-arrow {
       font-size: 13px;
@@ -712,10 +716,13 @@
       </div>
 
       <!-- Coach rec -->
-      <div class="card card-accent-red">
-        <div class="card-title"><span class="dot dot-red"></span>COACH RECOMMENDATION</div>
-        <div class="coach-text" id="fitCoachText">
-          <div class="loading"><div class="dot dot-dim pulse"></div></div>
+      <div class="card card-accent-red accordion-card">
+        <div class="card-title accordion-header" onclick="toggleAccordion(this)">
+          <span class="dot dot-red"></span>COACH RECOMMENDATION
+          <span class="accordion-arrow">▾</span>
+        </div>
+        <div class="accordion-body" style="display:none;">
+          <div class="coach-text" id="fitCoachText"></div>
         </div>
       </div>
 
