@@ -62,20 +62,26 @@ async function fetchPlaylistVideos(apiKey) {
   return videos;
 }
 
-// Batch-tag a list of videos in one Claude call (Haiku — fast and cheap for classification)
+// Batch-tag a list of videos in chunks (Haiku — fast and cheap for classification)
 async function tagVideos(videos) {
   if (!videos.length) return [];
 
-  const list = videos.map((v, i) =>
-    `[${i}] Channel: ${v.channel} | Title: ${v.title} | Description: ${v.description.slice(0, 150)}`
-  ).join('\n');
+  const CHUNK = 20;
+  const allTags = [];
 
-  const message = await anthropic.messages.create({
-    model: 'claude-haiku-4-5',
-    max_tokens: 4000,
-    messages: [{
-      role: 'user',
-      content: `You are tagging fitness videos for a personal training app used by a 51-year-old hybrid athlete (lifts + hikes + cycles). His main goals are: gaining muscle mass, hiking endurance, hip and shoulder mobility, and back development.
+  for (let start = 0; start < videos.length; start += CHUNK) {
+    const chunk = videos.slice(start, start + CHUNK);
+    const list = chunk.map((v, i) =>
+      `[${i}] Channel: ${v.channel} | Title: ${v.title} | Description: ${v.description.slice(0, 150)}`
+    ).join('\n');
+
+    try {
+      const message = await anthropic.messages.create({
+        model: 'claude-haiku-4-5',
+        max_tokens: 2000,
+        messages: [{
+          role: 'user',
+          content: `You are tagging fitness videos for a personal training app used by a 51-year-old hybrid athlete (lifts + hikes + cycles). His main goals are: gaining muscle mass, hiking endurance, hip and shoulder mobility, and back development.
 
 Tag each video with the SINGLE most relevant category from this list:
 ${CATEGORIES.join(', ')}
@@ -91,17 +97,22 @@ The "tags" field should have 2-4 specific muscle groups or movement patterns.
 
 Videos to classify:
 ${list}`,
-    }],
-  });
+        }],
+      });
 
-  try {
-    const text = message.content[0].text.trim();
-    const json = text.startsWith('[') ? text : text.slice(text.indexOf('['));
-    return JSON.parse(json);
-  } catch {
-    // Fallback: tag everything as general_fitness if parsing fails
-    return videos.map((_, i) => ({ index: i, category: 'general_fitness', source: 'other', tags: [] }));
+      const text = message.content[0].text.trim();
+      const json = text.startsWith('[') ? text : text.slice(text.indexOf('['));
+      const parsed = JSON.parse(json);
+      // Re-index to absolute positions
+      parsed.forEach(t => { t.index = start + t.index; });
+      allTags.push(...parsed);
+    } catch {
+      // Fallback for this chunk
+      chunk.forEach((_, i) => allTags.push({ index: start + i, category: 'general_fitness', source: 'other', tags: [] }));
+    }
   }
+
+  return allTags;
 }
 
 export default async function handler(req, res) {
